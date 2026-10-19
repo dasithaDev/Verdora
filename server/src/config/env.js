@@ -1,0 +1,18 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
+export const config = {
+  env: process.env.NODE_ENV || 'development',
+  port: parseInt(process.env.PORT, 10) || 5000,
+  mongoUri: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/healthy_cafe_dev',
+  clientOrigin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+};
+
+export const validateEnv = () => {
+  const missing = [];
+  if (!config.mongoUri) missing.push('MONGODB_URI');
+  if (missing.length > 0) {
+    console.error(`[ENV-ERROR] Missing critical environment variables: ${missing.join(', ')}`);
+    process.exit(1);
+  }
+};

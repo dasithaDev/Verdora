@@ -1,0 +1,23 @@
+{
+  "name": "verdora-healthy-cafe",
+  "version": "1.0.0",
+  "description": "Verdora - Healthy Cafe Ordering & Reservation System",
+  "private": true,
+  "scripts": {
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "start:server": "npm --prefix server start",
+    "build:client": "npm --prefix client run build",
+    "install:all": "npm install && npm --prefix server install && npm --prefix client install"
+  },
+  "keywords": [
+    "healthy-cafe",
+    "react",
+    "vite",
+    "express",
+    "mongodb",
+    "mern"
+  ],
+  "author": "",
+  "license": "ISC"
+}
