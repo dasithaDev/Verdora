@@ -6,6 +6,8 @@ export const config = {
   port: parseInt(process.env.PORT, 10) || 5000,
   mongoUri: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/healthy_cafe_dev',
   clientOrigin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+  jwtSecret: process.env.JWT_SECRET || 'verdora_development_jwt_secret_key_change_in_production_2026',
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
 };
 
 export const validateEnv = () => {
