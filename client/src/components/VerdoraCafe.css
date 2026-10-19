@@ -1897,3 +1897,113 @@
     flex-direction: column;
   }
 }
+
+/* ==========================================================================
+   ORDER HISTORY & TRACKING STYLES (PHASE 06)
+   ========================================================================== */
+.vrd-order-card {
+  background: #141f17;
+  border: 1px solid rgba(207, 161, 105, 0.25);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  transition: all 0.25s ease;
+}
+
+.vrd-order-card:hover {
+  border-color: var(--vrd-gold);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.vrd-order-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.vrd-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.vrd-status-badge.placed {
+  background: rgba(207, 161, 105, 0.18);
+  color: var(--vrd-gold);
+  border: 1px solid var(--vrd-gold);
+}
+
+.vrd-status-badge.preparing {
+  background: rgba(59, 130, 246, 0.18);
+  color: #60a5fa;
+  border: 1px solid #3b82f6;
+}
+
+.vrd-status-badge.ready {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid var(--vrd-emerald);
+}
+
+.vrd-status-badge.completed {
+  background: rgba(16, 185, 129, 0.12);
+  color: #a7f3d0;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.vrd-status-badge.cancelled {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid #ef4444;
+}
+
+.vrd-order-item-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  color: #d1ddd4;
+  margin-bottom: 6px;
+}
+
+.vrd-btn-cancel-order {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  color: #f87171;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.vrd-btn-cancel-order:hover {
+  background: #ef4444;
+  color: #ffffff;
+  border-color: #ef4444;
+}
+
+@keyframes vrd-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.vrd-spin {
+  animation: vrd-spin 1s linear infinite;
+}
