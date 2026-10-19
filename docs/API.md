@@ -86,6 +86,8 @@ Tokens are signed using HMAC SHA-256 (`JWT_SECRET`) and default to a 7-day expir
 
 ### 3.2 Authentication Routes (`/api/v1/auth`)
 
+> **Status:** Planned — implemented in **Phase 4**. Routes are not yet wired in `server/src/routes/api.js`.
+
 #### `POST /api/v1/auth/register`
 * **Access:** Public (Rate-limited to 20 req / 15 min)
 * **Body:**
@@ -149,6 +151,8 @@ Tokens are signed using HMAC SHA-256 (`JWT_SECRET`) and default to a 7-day expir
 
 ### 3.3 Menu Routes (`/api/v1/menu`)
 
+> **Status:** Planned — implemented in **Phase 5**. Routes are not yet wired in `server/src/routes/api.js`.
+
 #### `GET /api/v1/menu`
 * **Access:** Public
 * **Query Parameters:**
@@ -201,6 +205,8 @@ Tokens are signed using HMAC SHA-256 (`JWT_SECRET`) and default to a 7-day expir
 
 ### 3.4 Order Routes (`/api/v1/orders`)
 
+> **Status:** Planned — implemented in **Phase 6**. Routes are not yet wired in `server/src/routes/api.js`.
+
 #### `POST /api/v1/orders`
 * **Access:** Customer
 * **Body:**
@@ -251,6 +257,8 @@ Tokens are signed using HMAC SHA-256 (`JWT_SECRET`) and default to a 7-day expir
 ---
 
 ### 3.5 Reservation Routes (`/api/v1/reservations`)
+
+> **Status:** Planned — implemented in **Phase 7**. Routes are not yet wired in `server/src/routes/api.js`.
 
 #### `POST /api/v1/reservations`
 * **Access:** Customer

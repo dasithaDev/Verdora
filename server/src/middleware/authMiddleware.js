@@ -67,12 +67,13 @@ export const protect = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
+    // Do not include error.message in the response — it leaks JWT library internals
+    // (e.g. "jwt malformed", "invalid signature") to the client.
     return sendError(
       res,
       401,
       'TOKEN_INVALID',
-      'Session token is invalid or has expired. Please log in again.',
-      [{ originalMessage: error.message }]
+      'Session token is invalid or has expired. Please log in again.'
     );
   }
 };

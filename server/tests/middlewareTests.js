@@ -1,7 +1,7 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import { sanitizeInput } from '../src/middleware/sanitize.js';
-import { protect, requireRole, generateToken } from '../src/middleware/authMiddleware.js';
+import { requireRole } from '../src/middleware/authMiddleware.js';
 import { validateObjectId, validatePagination, validateRequiredBody } from '../src/middleware/validate.js';
 import { notFoundHandler, errorHandler } from '../src/middleware/errorMiddleware.js';
 import { sendSuccess } from '../src/utils/response.js';
@@ -51,6 +51,11 @@ const createTestApp = () => {
   // Validate Pagination route
   app.get('/test/items', validatePagination, (req, res) => {
     sendSuccess(res, 200, req.pagination);
+  });
+
+  // Validate Required Body route
+  app.post('/test/required-body', validateRequiredBody(['name', 'email']), (req, res) => {
+    sendSuccess(res, 200, { received: req.body });
   });
 
   // Sanitization test endpoint
@@ -117,6 +122,13 @@ const runMiddlewareTests = async () => {
     assert(resNoToken.status === 401, 'Protected route without token returns 401');
     assert(dataNoToken.error?.code === 'UNAUTHORIZED', 'Missing token returns code: UNAUTHORIZED');
 
+    const resInvalidToken = await fetch(`${baseUrl}/test/protected`, {
+      headers: { Authorization: 'Bearer invalid_token' },
+    });
+    const dataInvalidToken = await resInvalidToken.json();
+    assert(resInvalidToken.status === 401, 'Invalid token returns 401');
+    assert(dataInvalidToken.error?.code === 'TOKEN_INVALID', 'Invalid token returns code: TOKEN_INVALID');
+
     const resCustomer = await fetch(`${baseUrl}/test/protected`, {
       headers: { Authorization: 'Bearer customer_token' },
     });
@@ -145,6 +157,28 @@ const runMiddlewareTests = async () => {
     const dataPagination = await resPagination.json();
     assert(dataPagination.data.page === 2, 'Parses page query parameter');
     assert(dataPagination.data.limit === 50, 'Caps excessive limit query parameter to 50 max');
+
+    // TEST 5: Required Body Validation
+    console.log('\n--- Test Suite 5: Required Body Validator ---');
+    const resMissingBody = await fetch(`${baseUrl}/test/required-body`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Saman' }), // missing 'email'
+    });
+    const dataMissingBody = await resMissingBody.json();
+    assert(resMissingBody.status === 400, 'Missing required field returns 400');
+    assert(dataMissingBody.error?.code === 'VALIDATION_ERROR', 'Missing required field returns code: VALIDATION_ERROR');
+    assert(
+      dataMissingBody.error?.details?.some((d) => d.field === 'email'),
+      'Error details identify the missing field'
+    );
+
+    const resValidBody = await fetch(`${baseUrl}/test/required-body`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Saman', email: 'saman@verdora.local' }),
+    });
+    assert(resValidBody.status === 200, 'Complete required body passes validation');
 
     console.log('\n=======================================');
     console.log(` Results: ${passed} Passed, ${failed} Failed`);

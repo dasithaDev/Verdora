@@ -20,11 +20,13 @@ export const sanitizeValue = (value) => {
 };
 
 /**
- * Express middleware to sanitize req.body, req.query, and req.params against NoSQL injection.
+ * Express middleware to sanitize req.body and req.query against NoSQL injection.
+ * NOTE: req.params is NOT sanitized here — Express populates params per-route after
+ * global middleware runs, so sanitizing at this point is a no-op. Route-level ObjectId
+ * validation (validateObjectId) handles params safely instead.
  */
 export const sanitizeInput = (req, res, next) => {
   if (req.body) req.body = sanitizeValue(req.body);
   if (req.query) req.query = sanitizeValue(req.query);
-  if (req.params) req.params = sanitizeValue(req.params);
   next();
 };

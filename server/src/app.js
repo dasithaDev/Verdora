@@ -22,23 +22,23 @@ app.use(
   })
 );
 
-// 3. Body & Cookie Parsing
-app.use(express.json({ limit: '1mb' }));
-app.use(express.urlencoded({ extended: true, limit: '1mb' }));
-app.use(cookieParser());
-
-// 4. Request Sanitization (NoSQL injection guard)
-app.use(sanitizeInput);
-
-// 5. General Rate Limiter on API routes
-app.use('/api', apiLimiter);
-
-// 6. Request Logging
+// 3. Request Logging — registered early so ALL responses (including 429s) are captured
 if (config.env === 'development') {
   app.use(morgan('dev'));
 } else {
   app.use(morgan('combined'));
 }
+
+// 4. Body & Cookie Parsing
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+app.use(cookieParser());
+
+// 5. Request Sanitization (NoSQL injection guard on body and query only — params are populated per-route)
+app.use(sanitizeInput);
+
+// 6. General Rate Limiter on API routes
+app.use('/api', apiLimiter);
 
 // 7. API v1 Router Mount
 app.use('/api/v1', apiRouter);
