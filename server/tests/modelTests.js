@@ -91,20 +91,43 @@ const runModelTests = async () => {
     }
     assert(tableErrorCaught, 'Rejects zero/negative table capacity');
 
-    // TEST 5: Order Empty Items Array
+    // TEST 5: Order validation
     console.log('\n--- Test Suite 4: Order Model ---');
+
+    // 5a: Empty items array must be rejected
     const emptyOrder = new Order({
       userId: new mongoose.Types.ObjectId(),
       items: [],
-      subtotal: 0,
+      subtotal: 500,
     });
-    let orderErrorCaught = false;
+    let orderItemsErrorCaught = false;
     try {
       await emptyOrder.validate();
     } catch (err) {
-      orderErrorCaught = !!err.errors['items'];
+      orderItemsErrorCaught = !!err.errors['items'];
     }
-    assert(orderErrorCaught, 'Rejects order with empty items array');
+    assert(orderItemsErrorCaught, 'Rejects order with empty items array');
+
+    // 5b: Zero subtotal must be rejected (min 0.01)
+    const zeroSubtotalOrder = new Order({
+      userId: new mongoose.Types.ObjectId(),
+      items: [
+        {
+          menuItemId: new mongoose.Types.ObjectId(),
+          itemNameSnapshot: 'Test Item',
+          unitPriceSnapshot: 500,
+          quantity: 1,
+        },
+      ],
+      subtotal: 0,
+    });
+    let subtotalErrorCaught = false;
+    try {
+      await zeroSubtotalOrder.validate();
+    } catch (err) {
+      subtotalErrorCaught = !!err.errors['subtotal'];
+    }
+    assert(subtotalErrorCaught, 'Rejects order with zero subtotal');
 
     // TEST 6: Reservation Time Formatting
     console.log('\n--- Test Suite 5: Reservation Model ---');

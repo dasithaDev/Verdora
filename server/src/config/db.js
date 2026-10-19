@@ -13,8 +13,7 @@ export const connectDB = async () => {
     isConnected = true;
     console.log(`[Database] MongoDB connected: ${conn.connection.host}`);
   } catch (error) {
-    console.warn(`[Database] MongoDB connection warning: ${error.message}`);
-    // Do not crash server in Phase 0 if local MongoDB is not yet started, but track connectivity
+    console.error(`[Database] MongoDB connection failed: ${error.message}`);
     isConnected = false;
   }
 };

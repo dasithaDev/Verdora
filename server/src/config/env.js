@@ -12,7 +12,9 @@ export const config = {
 
 export const validateEnv = () => {
   const missing = [];
-  if (!config.mongoUri) missing.push('MONGODB_URI');
+  // Check raw env vars — config values have fallbacks so they are always truthy
+  if (!process.env.MONGODB_URI) missing.push('MONGODB_URI');
+  if (!process.env.JWT_SECRET) missing.push('JWT_SECRET');
   if (missing.length > 0) {
     console.error(`[ENV-ERROR] Missing critical environment variables: ${missing.join(', ')}`);
     process.exit(1);

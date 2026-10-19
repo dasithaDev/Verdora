@@ -20,7 +20,6 @@ export const sendSuccess = (res, statusCode = 200, data = {}) => {
  * @param {Array} details
  */
 export const sendError = (res, statusCode = 500, code = 'INTERNAL_SERVER_ERROR', message = 'An error occurred', details = []) => {
-  const isProd = process.env.NODE_ENV === 'production';
   return res.status(statusCode).json({
     success: false,
     error: {
