@@ -5,6 +5,9 @@ import { config } from '../config/env.js';
 
 dotenv.config();
 
+// ⚠️  DEVELOPMENT / DEMO USE ONLY — These are throwaway credentials for local testing.
+//    Never use these values in a staging or production environment.
+//    Production admins must be created via a separate secure provisioning process.
 const sampleUsers = [
   {
     name: 'Verdora Administrator',

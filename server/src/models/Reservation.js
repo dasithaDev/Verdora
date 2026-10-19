@@ -38,8 +38,10 @@ const reservationSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: {
-        values: ['pending', 'confirmed', 'cancelled', 'rejected', 'completed'],
-        message: '{VALUE} is not a valid reservation status',
+        // 'pending' is intentionally excluded: reservations are auto-confirmed on creation.
+        // See ARCHITECTURE.md §3.2 Reservation Lifecycle.
+        values: ['confirmed', 'cancelled', 'rejected', 'completed'],
+          message: '{VALUE} is not a valid reservation status',
       },
       default: 'confirmed',
       index: true,

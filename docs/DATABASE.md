@@ -154,7 +154,7 @@ Tracks customer dining reservations and table occupancy over time.
 | `startTime` | String | Required, regex `^([01]\d\|2[0-3]):([0-5]\d)$` | 24-hour dining start time (e.g. `12:00`) |
 | `endTime` | String | Required, regex `^([01]\d\|2[0-3]):([0-5]\d)$` | Calculated 24-hour end time (e.g. `13:30`) |
 | `guestCount` | Number | Required, min `1`, max `20` | Number of diners |
-| `status` | String | Enum: `['pending', 'confirmed', 'cancelled', 'rejected', 'completed']` | Reservation lifecycle status |
+| `status` | String | Enum: `['confirmed', 'cancelled', 'rejected', 'completed']`, default `'confirmed'` | Reservation lifecycle status — auto-confirmed on creation (see ARCHITECTURE.md §3.2) |
 | `specialRequest`| String | Optional, max 300 characters | Dietary or seating notes |
 
 **Indexes:**

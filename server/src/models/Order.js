@@ -15,7 +15,7 @@ const orderItemSnapshotSchema = new mongoose.Schema(
     unitPriceSnapshot: {
       type: Number,
       required: [true, 'Unit price snapshot is required'],
-      min: [0, 'Unit price snapshot cannot be negative'],
+      min: [0.01, 'Unit price snapshot must be greater than zero'],
     },
     quantity: {
       type: Number,
@@ -48,7 +48,7 @@ const orderSchema = new mongoose.Schema(
     subtotal: {
       type: Number,
       required: [true, 'Authoritative subtotal is required'],
-      min: [0, 'Subtotal cannot be negative'],
+      min: [0.01, 'Subtotal must be greater than zero'],
     },
     status: {
       type: String,
