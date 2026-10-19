@@ -30,6 +30,11 @@ import {
 } from 'lucide-react';
 import { getMenuItems } from '../services/menuService';
 import { createOrder, getMyOrders, cancelOrder } from '../services/orderService';
+import {
+  createReservation as apiCreateReservation,
+  getMyReservations as apiGetMyReservations,
+  cancelReservation as apiCancelReservation,
+} from '../services/reservationService';
 import { login as apiLogin, register as apiRegister, logout as apiLogout, getMe as apiGetMe } from '../services/authService';
 import './VerdoraCafe.css';
 
@@ -349,6 +354,12 @@ export default function VerdoraCafe({ onSwitchToCatalog }) {
   const [customerOrders, setCustomerOrders] = useState([]);
   const [isLoadingOrders, setIsLoadingOrders] = useState(false);
 
+  // Reservation States (Phase 07)
+  const [isSubmittingBooking, setIsSubmittingBooking] = useState(false);
+  const [isReservationsModalOpen, setIsReservationsModalOpen] = useState(false);
+  const [customerReservations, setCustomerReservations] = useState([]);
+  const [isLoadingReservations, setIsLoadingReservations] = useState(false);
+
   // Newsletter State
   const [newsletterEmail, setNewsletterEmail] = useState('');
 
@@ -506,19 +517,91 @@ export default function VerdoraCafe({ onSwitchToCatalog }) {
     }
   };
 
-  // Handle Table Booking Submission
-  const handleBookingSubmit = (e) => {
+  // Handle Real Table Booking Submission (Phase 07)
+  const handleBookingSubmit = async (e) => {
     e.preventDefault();
-    if (!bookingForm.firstName || !bookingForm.email || !bookingForm.phone || !bookingForm.date) {
-      showToast('Please fill out all reservation fields');
+    if (!currentUser) {
+      setAuthMode('login');
+      setIsAuthOpen(true);
+      showToast('Please sign in or register to reserve a table 🪴');
       return;
     }
-    const ticketId = 'VRD-' + Math.floor(100000 + Math.random() * 900000);
-    setBookingConfirmed({
-      ticketId,
-      ...bookingForm,
-    });
-    showToast(`Table confirmed at Verdora! Reference: ${ticketId} 🪴`);
+
+    if (!bookingForm.date) {
+      showToast('Please select a reservation date');
+      return;
+    }
+
+    // Map time slot to 24-hr format
+    const timeMap = {
+      '8:30 AM': '08:30',
+      '10:30 AM': '10:30',
+      '1:00 PM': '13:00',
+      '4:00 PM': '16:00',
+      '6:30 PM': '18:30',
+      '8:00 PM': '20:00',
+    };
+    const startTime = timeMap[bookingForm.time] || '18:30';
+
+    // Parse guest count e.g. "2 Persons (Table for Two)" -> 2
+    const guestMatch = bookingForm.guests.match(/^(\d+)/);
+    const guestCount = guestMatch ? parseInt(guestMatch[1], 10) : 2;
+
+    setIsSubmittingBooking(true);
+    try {
+      const res = await apiCreateReservation({
+        reservationDate: bookingForm.date,
+        startTime,
+        guestCount,
+        specialRequest: `${bookingForm.tableType} - Guest: ${bookingForm.firstName} (${bookingForm.phone})`,
+      });
+
+      const confirmedData = res.data;
+      setBookingConfirmed({
+        ticketId: 'VRD-' + confirmedData._id.slice(-6).toUpperCase(),
+        firstName: bookingForm.firstName || currentUser.name,
+        date: bookingForm.date,
+        time: bookingForm.time,
+        guests: bookingForm.guests,
+        tableType: confirmedData.tableId?.tableNumber
+          ? `Table ${confirmedData.tableId.tableNumber} (${bookingForm.tableType})`
+          : bookingForm.tableType,
+        ...confirmedData,
+      });
+      showToast(`🎉 Table reserved! Reference: VRD-${confirmedData._id.slice(-6).toUpperCase()} 🪴`);
+    } catch (err) {
+      const errMsg = err?.response?.data?.error?.message || err.message || 'Could not complete reservation';
+      showToast(`❌ ${errMsg}`);
+    } finally {
+      setIsSubmittingBooking(false);
+    }
+  };
+
+  // Handle Opening Customer Reservations History Modal
+  const handleOpenReservationsModal = async () => {
+    setIsReservationsModalOpen(true);
+    setIsLoadingReservations(true);
+    try {
+      const res = await apiGetMyReservations();
+      setCustomerReservations(res.data.reservations || []);
+    } catch (err) {
+      showToast('Could not load reservations');
+    } finally {
+      setIsLoadingReservations(false);
+    }
+  };
+
+  // Handle Cancelling a Customer Reservation
+  const handleCancelReservation = async (reservationId) => {
+    try {
+      await apiCancelReservation(reservationId);
+      showToast('Reservation cancelled successfully.');
+      const res = await apiGetMyReservations();
+      setCustomerReservations(res.data.reservations || []);
+    } catch (err) {
+      const errMsg = err?.response?.data?.error?.message || err.message || 'Could not cancel reservation';
+      showToast(`❌ ${errMsg}`);
+    }
   };
 
   // Handle Real Auth Submission (Login or Register)
@@ -630,16 +713,28 @@ export default function VerdoraCafe({ onSwitchToCatalog }) {
 
             {/* Orders Icon / Link for Logged In Customer */}
             {currentUser && (
-              <button
-                className="vrd-btn-login"
-                style={{ padding: '6px 14px', fontSize: '0.75rem', gap: '6px' }}
-                title="View My Order History"
-                onClick={handleOpenOrdersModal}
-              >
-                <Package size={14} />
-                <span>My Orders</span>
-              </button>
+              <>
+                <button
+                  className="vrd-btn-login"
+                  style={{ padding: '6px 14px', fontSize: '0.75rem', gap: '6px' }}
+                  title="View My Order History"
+                  onClick={handleOpenOrdersModal}
+                >
+                  <Package size={14} />
+                  <span>My Orders</span>
+                </button>
+                <button
+                  className="vrd-btn-login"
+                  style={{ padding: '6px 14px', fontSize: '0.75rem', gap: '6px' }}
+                  title="View My Table Reservations"
+                  onClick={handleOpenReservationsModal}
+                >
+                  <Calendar size={14} />
+                  <span>My Bookings</span>
+                </button>
+              </>
             )}
+
 
             {/* Login / User Status */}
             {currentUser ? (
@@ -1044,9 +1139,23 @@ export default function VerdoraCafe({ onSwitchToCatalog }) {
                 </div>
 
                 <div className="full-width" style={{ marginTop: '12px' }}>
-                  <button type="submit" className="vrd-btn-emerald" style={{ width: '100%', justifyContent: 'center' }}>
-                    <Calendar size={18} />
-                    <span>Confirm Table Reservation</span>
+                  <button
+                    type="submit"
+                    className="vrd-btn-emerald"
+                    style={{ width: '100%', justifyContent: 'center' }}
+                    disabled={isSubmittingBooking}
+                  >
+                    {isSubmittingBooking ? (
+                      <>
+                        <RefreshCw size={18} className="vrd-spin" />
+                        <span>Allocating Table & Reserving...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Calendar size={18} />
+                        <span>Confirm Table Reservation</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </form>
@@ -1975,6 +2084,128 @@ export default function VerdoraCafe({ onSwitchToCatalog }) {
                         >
                           <X size={14} />
                           <span>Cancel Order</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ====================================================================
+          CUSTOMER RESERVATIONS HISTORY MODAL (Phase 07)
+          ==================================================================== */}
+      {isReservationsModalOpen && (
+        <div
+          className="vrd-drawer-overlay"
+          style={{ alignItems: 'center', justifyContent: 'center' }}
+          onClick={() => setIsReservationsModalOpen(false)}
+        >
+          <div
+            className="vrd-modal-box"
+            style={{ maxWidth: '640px', maxHeight: '85vh', overflowY: 'auto' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Calendar size={22} color="var(--vrd-emerald)" />
+                <h3 style={{ fontSize: '1.4rem', color: '#ffffff', margin: 0 }}>My Table Reservations</h3>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <button
+                  className="vrd-icon-btn"
+                  title="Refresh Reservations"
+                  onClick={handleOpenReservationsModal}
+                  disabled={isLoadingReservations}
+                >
+                  <RefreshCw size={18} className={isLoadingReservations ? 'vrd-spin' : ''} />
+                </button>
+                <button className="vrd-icon-btn" onClick={() => setIsReservationsModalOpen(false)}>
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+
+            {isLoadingReservations ? (
+              <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--vrd-text-muted)' }}>
+                <RefreshCw size={24} className="vrd-spin" style={{ marginBottom: '12px' }} />
+                <p>Loading your reservations...</p>
+              </div>
+            ) : customerReservations.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--vrd-text-muted)' }}>
+                <div style={{ fontSize: '3rem', marginBottom: '12px' }}>🌿🪑</div>
+                <h4 style={{ color: '#ffffff', marginBottom: '8px' }}>No reservations found</h4>
+                <p style={{ fontSize: '0.9rem', marginBottom: '20px' }}>
+                  Reserve a table for your next healthy meal, coffee tasting, or casual meeting.
+                </p>
+                <button
+                  className="vrd-btn-emerald"
+                  style={{ margin: '0 auto' }}
+                  onClick={() => {
+                    setIsReservationsModalOpen(false);
+                    scrollTo('booking');
+                  }}
+                >
+                  Book a Table Now
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {customerReservations.map((resItem) => (
+                  <div key={resItem._id} className="vrd-order-card">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '10px' }}>
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#ffffff' }}>
+                          Ref #VRD-{resItem._id?.slice(-6).toUpperCase()}
+                        </div>
+                        <div style={{ fontSize: '0.78rem', color: '#88998e', marginTop: '2px' }}>
+                          Booked on: {new Date(resItem.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                      <span className={`vrd-status-badge ${resItem.status}`}>
+                        {resItem.status}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', fontSize: '0.88rem', color: '#d1ddd4', marginBottom: '12px' }}>
+                      <div>
+                        <span style={{ color: '#888' }}>Date: </span>
+                        <strong>{new Date(resItem.reservationDate).toLocaleDateString()}</strong>
+                      </div>
+                      <div>
+                        <span style={{ color: '#888' }}>Time: </span>
+                        <strong>{resItem.startTime} - {resItem.endTime}</strong>
+                      </div>
+                      <div>
+                        <span style={{ color: '#888' }}>Party Size: </span>
+                        <strong>{resItem.guestCount} {resItem.guestCount === 1 ? 'Guest' : 'Guests'}</strong>
+                      </div>
+                      <div>
+                        <span style={{ color: '#888' }}>Table: </span>
+                        <strong style={{ color: 'var(--vrd-emerald)' }}>
+                          {resItem.tableId?.tableNumber ? `Table ${resItem.tableId.tableNumber}` : 'Allocated on arrival'}
+                        </strong>
+                      </div>
+                    </div>
+
+                    {resItem.specialRequest && (
+                      <div style={{ fontSize: '0.8rem', color: '#9fb1a5', background: 'rgba(255,255,255,0.03)', padding: '6px 10px', borderRadius: '4px', marginBottom: '12px' }}>
+                        <em>Note: {resItem.specialRequest}</em>
+                      </div>
+                    )}
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', borderTop: '1px dashed rgba(255,255,255,0.08)', paddingTop: '10px' }}>
+                      {resItem.status === 'confirmed' && (
+                        <button
+                          className="vrd-btn-cancel-order"
+                          onClick={() => handleCancelReservation(resItem._id)}
+                          title="Cancel your reservation"
+                        >
+                          <X size={14} />
+                          <span>Cancel Booking</span>
                         </button>
                       )}
                     </div>

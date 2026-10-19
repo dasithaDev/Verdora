@@ -12,7 +12,9 @@
     "test:middleware": "node tests/middlewareTests.js",
     "test:auth": "node tests/authTests.js",
     "test:menu": "node tests/menuTests.js",
-    "test:orders": "node tests/orderTests.js"
+    "test:orders": "node tests/orderTests.js",
+    "test:reservations": "node tests/reservationTests.js",
+    "test": "npm run test:models && npm run test:middleware && npm run test:auth && npm run test:menu && npm run test:orders && npm run test:reservations"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

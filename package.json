@@ -8,6 +8,11 @@
     "dev:client": "npm --prefix client run dev",
     "start:server": "npm --prefix server start",
     "build:client": "npm --prefix client run build",
+    "test": "npm --prefix server test",
+    "test:reservations": "npm --prefix server run test:reservations",
+    "test:orders": "npm --prefix server run test:orders",
+    "test:menu": "npm --prefix server run test:menu",
+    "test:auth": "npm --prefix server run test:auth",
     "install:all": "npm install && npm --prefix server install && npm --prefix client install"
   },
   "keywords": [
