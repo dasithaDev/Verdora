@@ -16,7 +16,7 @@ import {
  * - Creates immutable item snapshots (name and unit price).
  * - Computes authoritative subtotal on the server (client totals are ignored).
  */
-export const createOrder = async (req, res) => {
+export const createOrder = async (req, res, next) => {
   try {
     const { isValid, errors, sanitizedItems, notes } = validateCreateOrderPayload(req.body);
 
@@ -81,16 +81,10 @@ export const createOrder = async (req, res) => {
 
     await newOrder.save();
 
-    return sendSuccess(res, 201, newOrder);
+    // Issue 5: use toJSON() so the schema transform strips __v and serializes correctly
+    return sendSuccess(res, 201, newOrder.toJSON());
   } catch (error) {
-    if (error.name === 'ValidationError') {
-      const details = Object.keys(error.errors).map((key) => ({
-        field: key,
-        message: error.errors[key].message,
-      }));
-      return sendError(res, 400, 'VALIDATION_ERROR', 'Validation failed on order save.', details);
-    }
-    return sendError(res, 500, 'INTERNAL_SERVER_ERROR', error.message);
+    next(error);
   }
 };
 
@@ -142,9 +136,8 @@ export const getOrderById = async (req, res) => {
 
     const currentUserId = (req.user._id || req.user.id).toString();
     const isOwner = order.userId.toString() === currentUserId;
-    const isAdminOrStaff = req.user.role === 'admin' || req.user.role === 'staff';
 
-    if (!isOwner && !isAdminOrStaff) {
+    if (!isOwner && req.user.role !== 'admin') {
       return sendError(
         res,
         403,
@@ -175,9 +168,8 @@ export const cancelOrder = async (req, res) => {
 
     const currentUserId = (req.user._id || req.user.id).toString();
     const isOwner = order.userId.toString() === currentUserId;
-    const isAdminOrStaff = req.user.role === 'admin' || req.user.role === 'staff';
 
-    if (!isOwner && !isAdminOrStaff) {
+    if (!isOwner && req.user.role !== 'admin') {
       return sendError(
         res,
         403,

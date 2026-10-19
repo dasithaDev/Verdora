@@ -258,7 +258,7 @@ const runOrderTests = async () => {
       res9.status === 200 &&
         data9.success === true &&
         Array.isArray(data9.data.orders) &&
-        data9.data.orders.every((o) => o.userId === testCustomer1._id.toString()),
+        data9.data.orders.every((o) => o.userId.toString() === testCustomer1._id.toString()),
       'ORD-09',
       'Customer order history endpoint returns strictly own orders'
     );

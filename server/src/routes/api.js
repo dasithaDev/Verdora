@@ -15,8 +15,8 @@ apiRouter.use('/auth', authRoutes);
 apiRouter.use('/menu', menuRoutes);
 apiRouter.use('/orders', orderRoutes);
 
-// Direct /admin/orders aliases per specification
-apiRouter.get('/admin/orders', protect, requireRole('admin', 'staff'), validatePagination, getAllOrdersAdmin);
-apiRouter.patch('/admin/orders/:id/status', protect, requireRole('admin', 'staff'), validateObjectId('id'), updateOrderStatusAdmin);
+// Admin order management — mounted here to avoid /:id shadow conflict inside orderRoutes.js
+apiRouter.get('/admin/orders', protect, requireRole('admin'), validatePagination, getAllOrdersAdmin);
+apiRouter.patch('/admin/orders/:id/status', protect, requireRole('admin'), validateObjectId('id'), updateOrderStatusAdmin);
 
 export default apiRouter;

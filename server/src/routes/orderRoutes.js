@@ -4,10 +4,8 @@ import {
   getMyOrders,
   getOrderById,
   cancelOrder,
-  getAllOrdersAdmin,
-  updateOrderStatusAdmin,
 } from '../controllers/orderController.js';
-import { protect, requireRole } from '../middleware/authMiddleware.js';
+import { protect } from '../middleware/authMiddleware.js';
 import { validateObjectId, validatePagination } from '../middleware/validate.js';
 
 const router = Router();
@@ -21,8 +19,7 @@ router.get('/my', validatePagination, getMyOrders);
 router.get('/:id', validateObjectId('id'), getOrderById);
 router.patch('/:id/cancel', validateObjectId('id'), cancelOrder);
 
-// Admin & Staff management endpoints
-router.get('/admin/all', requireRole('admin', 'staff'), validatePagination, getAllOrdersAdmin);
-router.patch('/admin/:id/status', requireRole('admin', 'staff'), validateObjectId('id'), updateOrderStatusAdmin);
+// Admin management routes are mounted directly on /admin/orders in api.js
+// to avoid the /:id shadow conflict that would occur if defined here.
 
 export default router;
