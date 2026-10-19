@@ -5,10 +5,8 @@ import {
   getReservationById,
   updateReservation,
   cancelReservation,
-  getAllReservationsAdmin,
-  updateReservationStatusAdmin,
 } from '../controllers/reservationController.js';
-import { protect, requireRole } from '../middleware/authMiddleware.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -19,9 +17,8 @@ router.get('/:id', protect, getReservationById);
 router.patch('/:id', protect, updateReservation);
 router.patch('/:id/cancel', protect, cancelReservation);
 
-// Admin-only endpoints
-router.get('/admin/all', protect, requireRole('admin'), getAllReservationsAdmin);
-router.patch('/admin/:id/status', protect, requireRole('admin'), updateReservationStatusAdmin);
+// Admin reservation management is mounted directly on /admin/reservations in api.js
+// to avoid the /:id shadow conflict that would occur if defined here.
 
 export default router;
 

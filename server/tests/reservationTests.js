@@ -237,8 +237,9 @@ const runReservationTests = async () => {
       }),
     });
     const data08 = await res08.json();
+    // tableId is populated: { _id, tableNumber, capacity }
     assert(
-      res08.status === 201 && data08.data?.tableId?.capacity >= 5,
+      res08.status === 201 && Number(data08.data?.tableId?.capacity) >= 5,
       'RES-08',
       'Smart table allocation assigns table matching capacity requirements'
     );
@@ -249,8 +250,9 @@ const runReservationTests = async () => {
       headers: { Authorization: `Bearer ${customer1Token}` },
     });
     const data09 = await res09.json();
+    // getMyReservations does NOT populate userId — it's the raw ObjectId string in JSON
     const allBelongToCustomer1 = data09.data?.reservations?.every(
-      (r) => r.userId.toString() === testCustomer1._id.toString() || r.userId?._id?.toString() === testCustomer1._id.toString()
+      (r) => r.userId?.toString() === testCustomer1._id.toString()
     );
     assert(
       res09.status === 200 && allBelongToCustomer1 && data09.data?.reservations?.length >= 2,

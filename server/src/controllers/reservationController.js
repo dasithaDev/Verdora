@@ -16,7 +16,7 @@ import {
  * POST /api/v1/reservations
  * Creates a new table reservation with server-side conflict detection
  */
-export const createReservation = async (req, res) => {
+export const createReservation = async (req, res, next) => {
   try {
     const { reservationDate, startTime, guestCount, tableId, specialRequest } = req.body;
     let endTime = req.body.endTime;
@@ -145,10 +145,9 @@ export const createReservation = async (req, res) => {
       .populate('tableId', 'tableNumber capacity')
       .populate('userId', 'name email');
 
-    return sendSuccess(res, 201, populatedReservation);
+    return sendSuccess(res, 201, populatedReservation.toJSON());
   } catch (error) {
-    console.error('Error creating reservation:', error);
-    return sendError(res, 500, 'SERVER_ERROR', 'Failed to create reservation');
+    next(error);
   }
 };
 
@@ -156,18 +155,18 @@ export const createReservation = async (req, res) => {
  * GET /api/v1/reservations/my
  * Customer: Retrieve own reservation history
  */
-export const getMyReservations = async (req, res) => {
+export const getMyReservations = async (req, res, next) => {
   try {
     const reservations = await Reservation.find({ userId: req.user._id })
       .populate('tableId', 'tableNumber capacity')
       .sort({ reservationDate: -1, startTime: -1 });
 
     return sendSuccess(res, 200, {
-      reservations,
+      reservations: reservations.map((r) => r.toJSON()),
       total: reservations.length,
     });
   } catch (error) {
-    return sendError(res, 500, 'SERVER_ERROR', 'Failed to retrieve your reservations');
+    next(error);
   }
 };
 
@@ -175,7 +174,7 @@ export const getMyReservations = async (req, res) => {
  * GET /api/v1/reservations/:id
  * Customer (owner) or Admin: Retrieve single reservation details
  */
-export const getReservationById = async (req, res) => {
+export const getReservationById = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -198,9 +197,9 @@ export const getReservationById = async (req, res) => {
       return sendError(res, 403, 'FORBIDDEN', 'Access denied to this reservation');
     }
 
-    return sendSuccess(res, 200, reservation);
+    return sendSuccess(res, 200, reservation.toJSON());
   } catch (error) {
-    return sendError(res, 500, 'SERVER_ERROR', 'Failed to retrieve reservation');
+    next(error);
   }
 };
 
@@ -208,7 +207,7 @@ export const getReservationById = async (req, res) => {
  * PATCH /api/v1/reservations/:id
  * Customer: Edit an existing confirmed reservation (subject to conflict re-validation)
  */
-export const updateReservation = async (req, res) => {
+export const updateReservation = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -300,9 +299,9 @@ export const updateReservation = async (req, res) => {
       .populate('tableId', 'tableNumber capacity')
       .populate('userId', 'name email');
 
-    return sendSuccess(res, 200, updated);
+    return sendSuccess(res, 200, updated.toJSON());
   } catch (error) {
-    return sendError(res, 500, 'SERVER_ERROR', 'Failed to update reservation');
+    next(error);
   }
 };
 
@@ -310,7 +309,7 @@ export const updateReservation = async (req, res) => {
  * PATCH /api/v1/reservations/:id/cancel
  * Customer or Admin: Cancel a confirmed reservation and free the slot
  */
-export const cancelReservation = async (req, res) => {
+export const cancelReservation = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -347,10 +346,10 @@ export const cancelReservation = async (req, res) => {
 
     return sendSuccess(res, 200, {
       message: 'Reservation cancelled successfully',
-      reservation,
+      reservation: reservation.toJSON(),
     });
   } catch (error) {
-    return sendError(res, 500, 'SERVER_ERROR', 'Failed to cancel reservation');
+    next(error);
   }
 };
 
@@ -358,11 +357,10 @@ export const cancelReservation = async (req, res) => {
  * GET /api/v1/admin/reservations
  * Admin: List all reservations with filtering & pagination
  */
-export const getAllReservationsAdmin = async (req, res) => {
+export const getAllReservationsAdmin = async (req, res, next) => {
   try {
-    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
-    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 10));
-    const skip = (page - 1) * limit;
+    // Use pagination values set by validatePagination middleware (mounted in api.js)
+    const { page, limit, skip } = req.pagination;
 
     const filter = {};
     if (req.query.status) {
@@ -377,13 +375,15 @@ export const getAllReservationsAdmin = async (req, res) => {
       }
     }
 
-    const total = await Reservation.countDocuments(filter);
-    const reservations = await Reservation.find(filter)
-      .populate('tableId', 'tableNumber capacity')
-      .populate('userId', 'name email')
-      .sort({ reservationDate: -1, startTime: -1 })
-      .skip(skip)
-      .limit(limit);
+    const [reservations, total] = await Promise.all([
+      Reservation.find(filter)
+        .populate('tableId', 'tableNumber capacity')
+        .populate('userId', 'name email')
+        .sort({ reservationDate: -1, startTime: -1 })
+        .skip(skip)
+        .limit(limit),
+      Reservation.countDocuments(filter),
+    ]);
 
     return sendSuccess(res, 200, {
       reservations,
@@ -395,7 +395,7 @@ export const getAllReservationsAdmin = async (req, res) => {
       },
     });
   } catch (error) {
-    return sendError(res, 500, 'SERVER_ERROR', 'Failed to query reservations');
+    next(error);
   }
 };
 
@@ -403,7 +403,7 @@ export const getAllReservationsAdmin = async (req, res) => {
  * PATCH /api/v1/admin/reservations/:id/status
  * Admin: Update reservation status following strict transition rules
  */
-export const updateReservationStatusAdmin = async (req, res) => {
+export const updateReservationStatusAdmin = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -438,9 +438,9 @@ export const updateReservationStatusAdmin = async (req, res) => {
 
     return sendSuccess(res, 200, {
       message: `Reservation status transitioned from ${currentStatus} to ${status}`,
-      reservation,
+      reservation: reservation.toJSON(),
     });
   } catch (error) {
-    return sendError(res, 500, 'SERVER_ERROR', 'Failed to update reservation status');
+    next(error);
   }
 };

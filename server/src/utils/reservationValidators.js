@@ -3,9 +3,22 @@
  * Verdora Healthy Cafe & Kitchen
  */
 
-export const OPENING_HOUR_MINUTES = 8 * 60; // 08:00 AM (480 minutes)
-export const CLOSING_HOUR_MINUTES = 22 * 60; // 22:00 PM (1320 minutes)
-export const DEFAULT_SLOT_MINUTES = 90; // 1.5 hours standard slot
+export const OPENING_HOUR_MINUTES = 8 * 60;         // 08:00 (480 minutes) — all days
+export const WEEKDAY_CLOSING_MINUTES = 22 * 60;     // 22:00 (1320 minutes) — Mon–Fri
+export const WEEKEND_CLOSING_MINUTES = 23 * 60;     // 23:00 (1380 minutes) — Sat–Sun
+export const CLOSING_HOUR_MINUTES = WEEKDAY_CLOSING_MINUTES; // legacy alias for non-date-aware callers
+export const DEFAULT_SLOT_MINUTES = 90;             // 1.5 hours standard slot
+
+/**
+ * Returns the closing time in minutes for a given date (weekend vs weekday).
+ * @param {Date|string} date
+ * @returns {number} minutes from midnight
+ */
+export const getClosingMinutes = (date) => {
+  const d = new Date(date);
+  const dayOfWeek = d.getDay(); // 0 = Sunday, 6 = Saturday
+  return (dayOfWeek === 0 || dayOfWeek === 6) ? WEEKEND_CLOSING_MINUTES : WEEKDAY_CLOSING_MINUTES;
+};
 
 /**
  * Valid state transitions for reservations
@@ -87,14 +100,17 @@ export const validateReservationInput = (body) => {
     }
   }
 
-  // 2. Start time validation
+  // 2. Start time validation (closing time is day-of-week aware: 22:00 weekdays, 23:00 weekends)
+  const closingMin = body.reservationDate ? getClosingMinutes(body.reservationDate) : WEEKDAY_CLOSING_MINUTES;
+  const closingLabel = closingMin === WEEKEND_CLOSING_MINUTES ? '23:00' : '22:00';
+
   const startMin = timeToMinutes(body.startTime);
   if (startMin === null) {
     errors.push({ field: 'startTime', message: 'Start time must be formatted as HH:mm (24-hour)' });
-  } else if (startMin < OPENING_HOUR_MINUTES || startMin >= CLOSING_HOUR_MINUTES) {
+  } else if (startMin < OPENING_HOUR_MINUTES || startMin >= closingMin) {
     errors.push({
       field: 'startTime',
-      message: 'Start time must be within cafe opening hours (08:00 - 22:00)',
+      message: `Start time must be within cafe opening hours (08:00 - ${closingLabel})`,
     });
   }
 
@@ -104,10 +120,10 @@ export const validateReservationInput = (body) => {
     endMin = timeToMinutes(body.endTime);
     if (endMin === null) {
       errors.push({ field: 'endTime', message: 'End time must be formatted as HH:mm (24-hour)' });
-    } else if (endMin > CLOSING_HOUR_MINUTES) {
+    } else if (endMin > closingMin) {
       errors.push({
         field: 'endTime',
-        message: 'End time cannot exceed cafe closing time (22:00)',
+        message: `End time cannot exceed cafe closing time (${closingLabel})`,
       });
     } else if (startMin !== null && endMin <= startMin) {
       errors.push({ field: 'endTime', message: 'End time must be after start time' });

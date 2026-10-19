@@ -6,6 +6,7 @@ import {
   timeToMinutes,
   minutesToTime,
   DEFAULT_SLOT_MINUTES,
+  WEEKDAY_CLOSING_MINUTES,
   doTimesOverlap,
 } from '../utils/reservationValidators.js';
 
@@ -13,12 +14,12 @@ import {
  * GET /api/v1/tables
  * Lists active cafe tables
  */
-export const getTables = async (req, res) => {
+export const getTables = async (req, res, next) => {
   try {
     const tables = await CafeTable.find({ isActive: true }).sort({ capacity: 1, tableNumber: 1 });
     return sendSuccess(res, 200, { tables, total: tables.length });
   } catch (error) {
-    return sendError(res, 500, 'SERVER_ERROR', 'Failed to retrieve cafe tables');
+    next(error);
   }
 };
 
@@ -27,7 +28,7 @@ export const getTables = async (req, res) => {
  * Check table availability for a specific date and time window
  * Query: date, startTime, [endTime], guestCount
  */
-export const checkAvailability = async (req, res) => {
+export const checkAvailability = async (req, res, next) => {
   try {
     const { date, startTime, guestCount } = req.query;
     let endTime = req.query.endTime;
@@ -35,7 +36,7 @@ export const checkAvailability = async (req, res) => {
     if (!endTime && startTime) {
       const sMin = timeToMinutes(startTime);
       if (sMin !== null) {
-        endTime = minutesToTime(Math.min(sMin + DEFAULT_SLOT_MINUTES, 22 * 60));
+        endTime = minutesToTime(Math.min(sMin + DEFAULT_SLOT_MINUTES, WEEKDAY_CLOSING_MINUTES));
       }
     }
 
@@ -86,6 +87,6 @@ export const checkAvailability = async (req, res) => {
       availableTables: freeTables,
     });
   } catch (error) {
-    return sendError(res, 500, 'SERVER_ERROR', 'Error checking table availability');
+    next(error);
   }
 };
