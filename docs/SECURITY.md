@@ -122,6 +122,8 @@ The authentication security layer is validated by `server/tests/authTests.js` co
 | `AUTH-09` | Incorrect Password | 401 Unauthorized; generic error message | **PASS** |
 | `AUTH-10` | Unknown Email | 401 Unauthorized; generic error message | **PASS** |
 | `AUTH-11` | Unauthenticated `/me` | 401 Unauthorized | **PASS** |
+| `AUTH-12` | Customer → admin endpoint | Customer role confirmed; full 403 covered by `middlewareTests.js` Suite 3 | **PASS** |
 | `AUTH-13` | Authenticated `/me` | 200 OK; returns profile without `passwordHash` | **PASS** |
 | `AUTH-14` | Logout | 200 OK; clears session cookie | **PASS** |
+| `AUTH-15` | Rate limiting | `authLimiter` wired on register/login; functional test requires 20+ rapid requests — covered in load test | **PENDING** |
 | `AUTH-16` | Data Minimization | Password hash verified stripped across all responses | **PASS** |

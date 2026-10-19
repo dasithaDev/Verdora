@@ -1,8 +1,7 @@
 import User from '../models/User.js';
 import { generateToken, cookieOptions } from '../middleware/authMiddleware.js';
 import { sendSuccess, sendError } from '../utils/response.js';
-
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { emailRegex } from '../utils/validators.js';
 
 /**
  * Register a new customer account.
@@ -69,13 +68,14 @@ export const register = async (req, res, next) => {
       role,
     });
 
-    // 5. Generate session token & set httpOnly cookie
+    // 5. Generate session token & set httpOnly cookie only
+    // Token is NOT included in the response body — it lives exclusively in the
+    // httpOnly cookie so JavaScript cannot read it (XSS protection).
     const token = generateToken(user._id, user.role);
     res.cookie('jwt', token, cookieOptions);
 
     return sendSuccess(res, 201, {
       message: 'Account registered successfully',
-      token,
       user: user.toJSON(),
     });
   } catch (error) {
@@ -91,16 +91,8 @@ export const register = async (req, res, next) => {
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-      return sendError(
-        res,
-        400,
-        'VALIDATION_ERROR',
-        'Both email and password are required.',
-        []
-      );
-    }
+    // Note: validateRequiredBody(['email','password']) already runs before this
+    // controller, so both fields are guaranteed non-empty at this point.
 
     // 1. Fetch user by normalized email
     const normalizedEmail = email.trim().toLowerCase();
@@ -117,13 +109,13 @@ export const login = async (req, res, next) => {
       );
     }
 
-    // 3. Issue session token & set httpOnly cookie
+    // 3. Issue session token & set httpOnly cookie only
+    // Token is NOT returned in the response body — httpOnly cookie only (XSS protection).
     const token = generateToken(user._id, user.role);
     res.cookie('jwt', token, cookieOptions);
 
     return sendSuccess(res, 200, {
       message: 'Authentication successful',
-      token,
       user: user.toJSON(),
     });
   } catch (error) {
@@ -137,11 +129,10 @@ export const login = async (req, res, next) => {
  * Access: Authenticated
  */
 export const logout = (req, res) => {
-  res.clearCookie('jwt', {
-    httpOnly: true,
-    sameSite: 'strict',
-    secure: process.env.NODE_ENV === 'production',
-  });
+  // Use the same cookie options (httpOnly, secure, sameSite) matching how the cookie was set,
+  // omitting maxAge so Express expires the cookie immediately without deprecation warnings.
+  const { maxAge, ...clearCookieOptions } = cookieOptions;
+  res.clearCookie('jwt', clearCookieOptions);
 
   return sendSuccess(res, 200, {
     message: 'Logged out successfully.',
