@@ -23,8 +23,14 @@ import {
   Sparkles,
   Leaf,
   UtensilsCrossed,
+  Package,
+  Truck,
+  Check,
+  RefreshCw,
 } from 'lucide-react';
 import { getMenuItems } from '../services/menuService';
+import { createOrder, getMyOrders, cancelOrder } from '../services/orderService';
+import { login as apiLogin, register as apiRegister, logout as apiLogout, getMe as apiGetMe } from '../services/authService';
 import './VerdoraCafe.css';
 
 // Lightweight Social SVG Icons
@@ -335,6 +341,14 @@ export default function VerdoraCafe({ onSwitchToCatalog }) {
   const [authForm, setAuthForm] = useState({ name: '', email: '', password: '' });
   const [currentUser, setCurrentUser] = useState(null);
 
+  // Orders State (Phase 06)
+  const [dbMenuItems, setDbMenuItems] = useState([]);
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [placedOrderConfirmed, setPlacedOrderConfirmed] = useState(null);
+  const [isOrdersModalOpen, setIsOrdersModalOpen] = useState(false);
+  const [customerOrders, setCustomerOrders] = useState([]);
+  const [isLoadingOrders, setIsLoadingOrders] = useState(false);
+
   // Newsletter State
   const [newsletterEmail, setNewsletterEmail] = useState('');
 
@@ -346,14 +360,34 @@ export default function VerdoraCafe({ onSwitchToCatalog }) {
     }, 3500);
   };
 
+  // Restore authenticated session & fetch real menu items on mount
+  useEffect(() => {
+    apiGetMe()
+      .then((res) => {
+        if (res?.data) setCurrentUser(res.data);
+      })
+      .catch(() => {
+        // Guest user
+      });
+
+    getMenuItems({ limit: 50 })
+      .then((res) => {
+        if (res?.data?.items?.length) {
+          setDbMenuItems(res.data.items);
+        }
+      })
+      .catch((err) => console.warn('Could not fetch DB items:', err));
+  }, []);
+
   // Add Item to Cart
   const addToCart = (item) => {
     setCart((prev) => {
-      const existing = prev.find((i) => i.id === item.id);
+      const itemId = item._id || item.id;
+      const existing = prev.find((i) => (i._id || i.id) === itemId);
       if (existing) {
-        return prev.map((i) => (i.id === item.id ? { ...i, qty: i.qty + 1 } : i));
+        return prev.map((i) => ((i._id || i.id) === itemId ? { ...i, qty: i.qty + 1 } : i));
       }
-      return [...prev, { ...item, qty: 1 }];
+      return [...prev, { ...item, id: itemId, qty: 1 }];
     });
     showToast(`Added ${item.name || item.title} to your tray! ☕`);
   };
@@ -363,7 +397,8 @@ export default function VerdoraCafe({ onSwitchToCatalog }) {
     setCart((prev) =>
       prev
         .map((item) => {
-          if (item.id === id) {
+          const itemId = item._id || item.id;
+          if (itemId === id) {
             const newQty = item.qty + delta;
             return newQty > 0 ? { ...item, qty: newQty } : null;
           }
@@ -376,10 +411,11 @@ export default function VerdoraCafe({ onSwitchToCatalog }) {
   // Toggle Wishlist
   const toggleWishlist = (item) => {
     setWishlist((prev) => {
-      const exists = prev.some((i) => i.id === item.id);
+      const itemId = item._id || item.id;
+      const exists = prev.some((i) => (i._id || i.id) === itemId);
       if (exists) {
         showToast('Removed from favorites');
-        return prev.filter((i) => i.id !== item.id);
+        return prev.filter((i) => (i._id || i.id) !== itemId);
       } else {
         showToast(`Saved ${item.title || item.name} to favorites ❤️`);
         return [...prev, item];
@@ -390,6 +426,85 @@ export default function VerdoraCafe({ onSwitchToCatalog }) {
   // Cart Totals in LKR
   const cartSubtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
   const cartItemCount = cart.reduce((sum, item) => sum + item.qty, 0);
+
+  // Handle Order Checkout (Phase 06 Lifecycle)
+  const handleCheckout = async () => {
+    if (!currentUser) {
+      setIsCartOpen(false);
+      setAuthMode('login');
+      setIsAuthOpen(true);
+      showToast('Please sign in or register to place your order ☕');
+      return;
+    }
+
+    if (cart.length === 0) {
+      showToast('Your order tray is empty!');
+      return;
+    }
+
+    setIsPlacingOrder(true);
+    try {
+      // Map cart items to authoritative MongoDB Item IDs
+      const orderItems = cart.map((cartItem) => {
+        let matchedId = cartItem._id;
+
+        if (!matchedId && dbMenuItems.length > 0) {
+          const found = dbMenuItems.find(
+            (dbItem) => dbItem.name.toLowerCase().trim() === (cartItem.name || cartItem.title).toLowerCase().trim()
+          );
+          if (found) matchedId = found._id;
+        }
+
+        // If still no direct match, pair with first available database item
+        if (!matchedId && dbMenuItems.length > 0) {
+          matchedId = dbMenuItems[0]._id;
+        }
+
+        return {
+          menuItemId: matchedId,
+          quantity: cartItem.qty,
+        };
+      });
+
+      const res = await createOrder({ items: orderItems, notes: '' });
+      setPlacedOrderConfirmed(res.data);
+      setCart([]);
+      setIsCartOpen(false);
+      showToast(`🎉 Order placed successfully! Reference #${res.data._id.slice(-6).toUpperCase()}`);
+    } catch (err) {
+      const errMsg = err?.response?.data?.error?.message || err.message || 'Failed to place order';
+      showToast(`❌ ${errMsg}`);
+    } finally {
+      setIsPlacingOrder(false);
+    }
+  };
+
+  // Handle Opening Order History Modal
+  const handleOpenOrdersModal = async () => {
+    setIsOrdersModalOpen(true);
+    setIsLoadingOrders(true);
+    try {
+      const res = await getMyOrders({ limit: 20 });
+      setCustomerOrders(res.data.orders || []);
+    } catch (err) {
+      showToast('Could not load orders');
+    } finally {
+      setIsLoadingOrders(false);
+    }
+  };
+
+  // Handle Order Cancellation by Customer
+  const handleCancelOrder = async (orderId) => {
+    try {
+      await cancelOrder(orderId);
+      showToast('Order cancelled successfully.');
+      const res = await getMyOrders({ limit: 20 });
+      setCustomerOrders(res.data.orders || []);
+    } catch (err) {
+      const errMsg = err?.response?.data?.error?.message || err.message || 'Could not cancel order';
+      showToast(`❌ ${errMsg}`);
+    }
+  };
 
   // Handle Table Booking Submission
   const handleBookingSubmit = (e) => {
@@ -406,20 +521,39 @@ export default function VerdoraCafe({ onSwitchToCatalog }) {
     showToast(`Table confirmed at Verdora! Reference: ${ticketId} 🪴`);
   };
 
-  // Handle Auth Submission
-  const handleAuthSubmit = (e) => {
+  // Handle Real Auth Submission (Login or Register)
+  const handleAuthSubmit = async (e) => {
     e.preventDefault();
     if (!authForm.email || !authForm.password) {
       showToast('Please enter your email and password');
       return;
     }
-    const mockUser = {
-      name: authForm.name || authForm.email.split('@')[0],
-      email: authForm.email,
-    };
-    setCurrentUser(mockUser);
-    setIsAuthOpen(false);
-    showToast(`Welcome to Verdora, ${mockUser.name}! 👋`);
+
+    try {
+      let res;
+      if (authMode === 'login') {
+        res = await apiLogin({ email: authForm.email, password: authForm.password });
+        showToast(`Welcome back, ${res.data.name}! 👋`);
+      } else {
+        res = await apiRegister({ name: authForm.name, email: authForm.email, password: authForm.password });
+        showToast(`Account created! Welcome to Verdora, ${res.data.name}! 🌿`);
+      }
+      setCurrentUser(res.data);
+      setIsAuthOpen(false);
+      setAuthForm({ name: '', email: '', password: '' });
+    } catch (err) {
+      const errMsg = err?.response?.data?.error?.message || err.message || 'Authentication failed';
+      showToast(`❌ ${errMsg}`);
+    }
+  };
+
+  // Handle Sign Out
+  const handleSignOut = async () => {
+    try {
+      await apiLogout();
+    } catch (e) {}
+    setCurrentUser(null);
+    showToast('You have signed out of Verdora.');
   };
 
   // Handle Newsletter
@@ -494,6 +628,19 @@ export default function VerdoraCafe({ onSwitchToCatalog }) {
               )}
             </button>
 
+            {/* Orders Icon / Link for Logged In Customer */}
+            {currentUser && (
+              <button
+                className="vrd-btn-login"
+                style={{ padding: '6px 14px', fontSize: '0.75rem', gap: '6px' }}
+                title="View My Order History"
+                onClick={handleOpenOrdersModal}
+              >
+                <Package size={14} />
+                <span>My Orders</span>
+              </button>
+            )}
+
             {/* Login / User Status */}
             {currentUser ? (
               <div
@@ -505,10 +652,8 @@ export default function VerdoraCafe({ onSwitchToCatalog }) {
                   fontWeight: 600,
                   cursor: 'pointer',
                 }}
-                onClick={() => {
-                  setCurrentUser(null);
-                  showToast('You have signed out of Verdora.');
-                }}
+                onClick={handleSignOut}
+                title="Click to Sign Out"
               >
                 <User size={16} />
                 <span>{currentUser.name}</span>
@@ -1520,14 +1665,20 @@ export default function VerdoraCafe({ onSwitchToCatalog }) {
                 <button
                   className="vrd-btn-emerald"
                   style={{ width: '100%', justifyContent: 'center' }}
-                  onClick={() => {
-                    setCart([]);
-                    setIsCartOpen(false);
-                    showToast('🎉 Order received! The kitchen is preparing your fresh meal.');
-                  }}
+                  onClick={handleCheckout}
+                  disabled={isPlacingOrder}
                 >
-                  <Sparkles size={18} />
-                  <span>Proceed To Checkout</span>
+                  {isPlacingOrder ? (
+                    <>
+                      <RefreshCw size={18} className="vrd-spin" />
+                      <span>Placing Order...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles size={18} />
+                      <span>Proceed To Checkout</span>
+                    </>
+                  )}
                 </button>
               </div>
             )}
@@ -1602,6 +1753,235 @@ export default function VerdoraCafe({ onSwitchToCatalog }) {
             >
               Save Reservation & Close
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ====================================================================
+          LIVE ORDER CONFIRMATION & TRACKING MODAL (Phase 06)
+          ==================================================================== */}
+      {placedOrderConfirmed && (
+        <div
+          className="vrd-drawer-overlay"
+          style={{ alignItems: 'center', justifyContent: 'center' }}
+          onClick={() => setPlacedOrderConfirmed(null)}
+        >
+          <div className="vrd-modal-box" style={{ maxWidth: '540px' }} onClick={(e) => e.stopPropagation()}>
+            <button
+              className="vrd-icon-btn"
+              style={{ position: 'absolute', top: '16px', right: '16px' }}
+              onClick={() => setPlacedOrderConfirmed(null)}
+            >
+              <X size={20} />
+            </button>
+
+            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+              <div style={{ fontSize: '3rem', marginBottom: '8px' }}>🎉☕</div>
+              <h3 style={{ fontSize: '1.6rem', color: 'var(--vrd-emerald)', marginBottom: '4px' }}>
+                Order Received!
+              </h3>
+              <p style={{ color: 'var(--vrd-text-muted)', fontSize: '0.88rem' }}>
+                Order Ref: <strong style={{ color: 'var(--vrd-gold)' }}>#{placedOrderConfirmed._id?.slice(-8).toUpperCase()}</strong>
+              </p>
+            </div>
+
+            {/* Stepper Tracker */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '24px 0', position: 'relative' }}>
+              {[
+                { key: 'placed', label: 'Placed', icon: <Package size={16} /> },
+                { key: 'preparing', label: 'Kitchen', icon: <UtensilsCrossed size={16} /> },
+                { key: 'ready', label: 'Ready', icon: <Sparkles size={16} /> },
+                { key: 'completed', label: 'Served', icon: <CheckCircle size={16} /> },
+              ].map((step, idx) => {
+                const orderStatus = placedOrderConfirmed.status;
+                const statusOrder = ['placed', 'preparing', 'ready', 'completed'];
+                const currentIdx = statusOrder.indexOf(orderStatus);
+                const isPassed = currentIdx >= idx;
+                const isActive = orderStatus === step.key;
+
+                return (
+                  <div key={step.key} style={{ textAlign: 'center', zIndex: 2, flex: 1 }}>
+                    <div
+                      style={{
+                        width: '38px',
+                        height: '38px',
+                        margin: '0 auto 6px',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: isActive ? 'var(--vrd-emerald)' : isPassed ? 'rgba(16, 185, 129, 0.25)' : '#1a271e',
+                        border: `2px solid ${isPassed ? 'var(--vrd-emerald)' : '#334438'}`,
+                        color: isPassed ? '#ffffff' : '#77887e',
+                        transition: 'all 0.3s ease',
+                      }}
+                    >
+                      {step.icon}
+                    </div>
+                    <span style={{ fontSize: '0.75rem', fontWeight: isActive ? 700 : 500, color: isActive ? 'var(--vrd-emerald)' : '#88998e' }}>
+                      {step.label}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Items Snapshot Card */}
+            <div
+              style={{
+                background: '#0d1610',
+                border: '1px solid rgba(16, 185, 129, 0.2)',
+                borderRadius: '10px',
+                padding: '16px 20px',
+                marginBottom: '20px',
+              }}
+            >
+              <div style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '10px' }}>
+                Order Summary (Immutable Snapshot)
+              </div>
+              {placedOrderConfirmed.items?.map((it, idx) => (
+                <div key={idx} className="vrd-order-item-line">
+                  <span>{it.quantity}x {it.itemNameSnapshot}</span>
+                  <span style={{ fontWeight: 600 }}>Rs. {(it.unitPriceSnapshot * it.quantity).toLocaleString()}</span>
+                </div>
+              ))}
+              <div style={{ borderTop: '1px solid #1a271e', marginTop: '12px', paddingTop: '10px', display: 'flex', justifyContent: 'space-between', fontSize: '1.1rem', fontWeight: 800, color: 'var(--vrd-emerald)' }}>
+                <span>Total Amount:</span>
+                <span>Rs. {placedOrderConfirmed.totalAmount?.toLocaleString()}</span>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                className="vrd-btn-gold"
+                style={{ flex: 1, justifyContent: 'center' }}
+                onClick={() => {
+                  setPlacedOrderConfirmed(null);
+                  handleOpenOrdersModal();
+                }}
+              >
+                <Package size={16} />
+                <span>View All Orders</span>
+              </button>
+              <button
+                className="vrd-btn-emerald"
+                style={{ flex: 1, justifyContent: 'center' }}
+                onClick={() => setPlacedOrderConfirmed(null)}
+              >
+                <span>Continue Dining</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ====================================================================
+          CUSTOMER ORDERS HISTORY MODAL (Phase 06)
+          ==================================================================== */}
+      {isOrdersModalOpen && (
+        <div
+          className="vrd-drawer-overlay"
+          style={{ alignItems: 'center', justifyContent: 'center' }}
+          onClick={() => setIsOrdersModalOpen(false)}
+        >
+          <div
+            className="vrd-modal-box"
+            style={{ maxWidth: '640px', maxHeight: '85vh', overflowY: 'auto' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Package size={22} color="var(--vrd-emerald)" />
+                <h3 style={{ fontSize: '1.4rem', color: '#ffffff', margin: 0 }}>My Order History</h3>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <button
+                  className="vrd-icon-btn"
+                  title="Refresh Orders"
+                  onClick={handleOpenOrdersModal}
+                  disabled={isLoadingOrders}
+                >
+                  <RefreshCw size={18} className={isLoadingOrders ? 'vrd-spin' : ''} />
+                </button>
+                <button className="vrd-icon-btn" onClick={() => setIsOrdersModalOpen(false)}>
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+
+            {isLoadingOrders ? (
+              <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--vrd-text-muted)' }}>
+                <RefreshCw size={24} className="vrd-spin" style={{ marginBottom: '12px' }} />
+                <p>Loading your orders...</p>
+              </div>
+            ) : customerOrders.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--vrd-text-muted)' }}>
+                <div style={{ fontSize: '3rem', marginBottom: '12px' }}>🌿🍵</div>
+                <h4 style={{ color: '#ffffff', marginBottom: '8px' }}>No orders yet</h4>
+                <p style={{ fontSize: '0.9rem', marginBottom: '20px' }}>
+                  Explore our nourishing organic menu and place your first table order!
+                </p>
+                <button
+                  className="vrd-btn-emerald"
+                  style={{ margin: '0 auto' }}
+                  onClick={() => {
+                    setIsOrdersModalOpen(false);
+                    scrollTo('menu');
+                  }}
+                >
+                  Explore Menu
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {customerOrders.map((ord) => (
+                  <div key={ord._id} className="vrd-order-card">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '10px' }}>
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#ffffff' }}>
+                          Order #{ord._id?.slice(-8).toUpperCase()}
+                        </div>
+                        <div style={{ fontSize: '0.78rem', color: '#88998e', marginTop: '2px' }}>
+                          {new Date(ord.createdAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}
+                        </div>
+                      </div>
+                      <span className={`vrd-status-badge ${ord.status}`}>
+                        {ord.status}
+                      </span>
+                    </div>
+
+                    <div style={{ marginBottom: '12px' }}>
+                      {ord.items?.map((it, idx) => (
+                        <div key={idx} className="vrd-order-item-line">
+                          <span>{it.quantity}x {it.itemNameSnapshot}</span>
+                          <span style={{ fontWeight: 600 }}>Rs. {(it.unitPriceSnapshot * it.quantity).toLocaleString()}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px dashed rgba(255,255,255,0.08)', paddingTop: '10px' }}>
+                      <div>
+                        <span style={{ fontSize: '0.8rem', color: '#88998e', marginRight: '6px' }}>Total:</span>
+                        <strong style={{ fontSize: '1.05rem', color: 'var(--vrd-emerald)' }}>
+                          Rs. {ord.totalAmount?.toLocaleString()}
+                        </strong>
+                      </div>
+
+                      {ord.status === 'placed' && (
+                        <button
+                          className="vrd-btn-cancel-order"
+                          onClick={() => handleCancelOrder(ord._id)}
+                          title="Cancel order before preparation begins"
+                        >
+                          <X size={14} />
+                          <span>Cancel Order</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
