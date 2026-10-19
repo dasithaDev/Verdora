@@ -15,6 +15,10 @@ export const connectDB = async () => {
   } catch (error) {
     console.error(`[Database] MongoDB connection failed: ${error.message}`);
     isConnected = false;
+    if (config.env === 'production') {
+      console.error('[Database] Critical: Terminating process due to database connection failure in production.');
+      process.exit(1);
+    }
   }
 };
 
