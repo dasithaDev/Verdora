@@ -2,10 +2,10 @@ import * as React from "react"
 import { TrendingUp, ShoppingBag, Calendar, UtensilsCrossed } from "lucide-react"
 
 export function DashboardStats({ stats }: { stats?: any }) {
-  const revenue = stats?.summary?.totalRevenue || 128450
-  const activeOrders = stats?.orders?.activeKitchenQueue || 6
-  const bookings = stats?.reservations?.today || 8
-  const activeDishes = stats?.menu?.activeAvailable || 24
+  const revenue = stats?.summary?.totalRevenue ?? 128450
+  const activeOrders = stats?.summary?.activeKitchenOrders ?? 6
+  const bookings = stats?.summary?.todayReservationsCount ?? 8
+  const activeDishes = stats?.summary?.activeMenuItems ?? 24
 
   return (
     <div className="dashboard-4-stats-grid">

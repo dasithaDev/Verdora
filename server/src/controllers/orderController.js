@@ -250,7 +250,7 @@ export const getAllOrdersAdmin = async (req, res, next) => {
 /**
  * Admin: Update order status adhering to the strict State Transition Matrix.
  */
-export const updateOrderStatusAdmin = async (req, res) => {
+export const updateOrderStatusAdmin = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -289,6 +289,6 @@ export const updateOrderStatusAdmin = async (req, res) => {
 
     return sendSuccess(res, 200, order);
   } catch (error) {
-    return sendError(res, 500, 'INTERNAL_SERVER_ERROR', error.message);
+    next(error);
   }
 };
