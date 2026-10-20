@@ -17,6 +17,7 @@ import {
   ChevronRight,
   ShieldCheck,
   Search,
+  User,
 } from 'lucide-react';
 import {
   getDashboardStats,
@@ -32,7 +33,7 @@ import {
 import { getMenuItems } from '../services/menuService';
 import './AdminDashboard.css';
 
-export default function AdminDashboard({ onBackToCafe, currentUser }) {
+export default function AdminDashboard({ onBackToCafe, onSwitchToProfile, currentUser }) {
   // Navigation Tabs: 'orders' | 'reservations' | 'menu' | 'tables'
   const [activeTab, setActiveTab] = useState('orders');
 
@@ -287,6 +288,25 @@ export default function AdminDashboard({ onBackToCafe, currentUser }) {
             <RefreshCw size={14} className={isLoadingStats ? 'vrd-spin' : ''} />
             <span>Sync</span>
           </button>
+
+          {onSwitchToProfile && (
+            <button
+              className="vrd-chip"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                color: 'var(--vrd-emerald, #10b981)',
+                borderColor: 'rgba(16, 185, 129, 0.45)',
+                background: 'rgba(16, 185, 129, 0.1)',
+              }}
+              onClick={onSwitchToProfile}
+              title="View and Edit Profile"
+            >
+              <User size={14} />
+              <span>Admin Profile</span>
+            </button>
+          )}
 
           <button
             className="vrd-chip"

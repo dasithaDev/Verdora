@@ -150,3 +150,50 @@ export const getMe = (req, res) => {
     user: req.user.toJSON ? req.user.toJSON() : req.user,
   });
 };
+
+/**
+ * Update authenticated user's profile details or password.
+ * Route: PATCH /api/v1/auth/profile
+ * Access: Authenticated
+ */
+export const updateProfile = async (req, res, next) => {
+  try {
+    const { name, currentPassword, newPassword } = req.body;
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return sendError(res, 404, 'NOT_FOUND', 'User profile not found.');
+    }
+
+    if (name && typeof name === 'string') {
+      const trimmedName = name.trim();
+      if (trimmedName.length < 2) {
+        return sendError(res, 400, 'VALIDATION_ERROR', 'Name must be at least 2 characters long.', [{ field: 'name' }]);
+      }
+      user.name = trimmedName;
+    }
+
+    if (newPassword) {
+      if (!currentPassword) {
+        return sendError(res, 400, 'VALIDATION_ERROR', 'Current password is required to set a new password.', [{ field: 'currentPassword' }]);
+      }
+      const isMatch = await user.matchPassword(currentPassword);
+      if (!isMatch) {
+        return sendError(res, 401, 'UNAUTHORIZED', 'Incorrect current password.', [{ field: 'currentPassword' }]);
+      }
+      if (typeof newPassword !== 'string' || newPassword.length < 8) {
+        return sendError(res, 400, 'VALIDATION_ERROR', 'New password must be at least 8 characters long.', [{ field: 'newPassword' }]);
+      }
+      user.passwordHash = await User.hashPassword(newPassword);
+    }
+
+    await user.save();
+
+    return sendSuccess(res, 200, {
+      message: 'Profile updated successfully',
+      user: user.toJSON(),
+    });
+  } catch (error) {
+    next(error);
+  }
+};

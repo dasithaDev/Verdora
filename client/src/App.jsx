@@ -1,28 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import VerdoraCafe from './components/VerdoraCafe';
 import MenuPage from './components/MenuPage';
 import AdminDashboard from './components/AdminDashboard';
+import ProfilePage from './components/ProfilePage';
+import { getMe as apiGetMe } from './services/authService';
 import './components/MenuPage.css';
 
 const VIEW_MODES = {
   CAFE_HOME: 'cafe_home',
   DATABASE_CATALOG: 'database_catalog',
   ADMIN_DASHBOARD: 'admin_dashboard',
+  PROFILE: 'profile',
 };
 
 export default function App() {
   const getInitialView = () => {
     if (window.location.hash === '#admin') return VIEW_MODES.ADMIN_DASHBOARD;
     if (window.location.hash === '#catalog') return VIEW_MODES.DATABASE_CATALOG;
+    if (window.location.hash === '#profile') return VIEW_MODES.PROFILE;
     return VIEW_MODES.CAFE_HOME;
   };
 
   const [currentView, setCurrentView] = useState(getInitialView);
+  const [currentUser, setCurrentUser] = useState(null);
 
-  React.useEffect(() => {
+  // Sync current user on mount
+  useEffect(() => {
+    apiGetMe()
+      .then((res) => {
+        if (res?.data) setCurrentUser(res.data);
+      })
+      .catch(() => {
+        setCurrentUser(null);
+      });
+
     const handleHash = () => {
       if (window.location.hash === '#admin') setCurrentView(VIEW_MODES.ADMIN_DASHBOARD);
       else if (window.location.hash === '#catalog') setCurrentView(VIEW_MODES.DATABASE_CATALOG);
+      else if (window.location.hash === '#profile') setCurrentView(VIEW_MODES.PROFILE);
       else if (!window.location.hash) setCurrentView(VIEW_MODES.CAFE_HOME);
     };
     window.addEventListener('hashchange', handleHash);
@@ -40,11 +55,30 @@ export default function App() {
         <VerdoraCafe
           onSwitchToCatalog={() => navigateTo(VIEW_MODES.DATABASE_CATALOG, 'catalog')}
           onSwitchToAdmin={() => navigateTo(VIEW_MODES.ADMIN_DASHBOARD, 'admin')}
+          onSwitchToProfile={() => navigateTo(VIEW_MODES.PROFILE, 'profile')}
+          onAuthSuccess={(user) => setCurrentUser(user)}
         />
       )}
 
       {currentView === VIEW_MODES.ADMIN_DASHBOARD && (
-        <AdminDashboard onBackToCafe={() => navigateTo(VIEW_MODES.CAFE_HOME, '')} />
+        <AdminDashboard
+          onBackToCafe={() => navigateTo(VIEW_MODES.CAFE_HOME, '')}
+          onSwitchToProfile={() => navigateTo(VIEW_MODES.PROFILE, 'profile')}
+          currentUser={currentUser}
+        />
+      )}
+
+      {currentView === VIEW_MODES.PROFILE && (
+        <ProfilePage
+          currentUser={currentUser}
+          onBackToCafe={() => navigateTo(VIEW_MODES.CAFE_HOME, '')}
+          onSwitchToAdmin={() => navigateTo(VIEW_MODES.ADMIN_DASHBOARD, 'admin')}
+          onUserUpdate={(updated) => setCurrentUser(updated)}
+          onSignOut={() => {
+            setCurrentUser(null);
+            navigateTo(VIEW_MODES.CAFE_HOME, '');
+          }}
+        />
       )}
 
       {currentView === VIEW_MODES.DATABASE_CATALOG && (

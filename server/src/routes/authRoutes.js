@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { register, login, logout, getMe } from '../controllers/authController.js';
+import { register, login, logout, getMe, updateProfile } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import { authLimiter } from '../middleware/rateLimiter.js';
 import { validateRequiredBody } from '../middleware/validate.js';
@@ -13,5 +13,6 @@ router.post('/login', authLimiter, validateRequiredBody(['email', 'password']), 
 // Authenticated session endpoints
 router.post('/logout', protect, logout);
 router.get('/me', protect, getMe);
+router.patch('/profile', protect, updateProfile);
 
 export default router;

@@ -311,7 +311,12 @@ const JOURNAL_POSTS = [
   },
 ];
 
-export default function VerdoraCafe({ onSwitchToCatalog, onSwitchToAdmin }) {
+export default function VerdoraCafe({
+  onSwitchToCatalog,
+  onSwitchToAdmin,
+  onSwitchToProfile,
+  onAuthSuccess,
+}) {
   // Navigation & Scroll
   const [activeSection, setActiveSection] = useState('home');
 
@@ -375,7 +380,10 @@ export default function VerdoraCafe({ onSwitchToCatalog, onSwitchToAdmin }) {
   useEffect(() => {
     apiGetMe()
       .then((res) => {
-        if (res?.data) setCurrentUser(res.data);
+        if (res?.data) {
+          setCurrentUser(res.data);
+          if (onAuthSuccess) onAuthSuccess(res.data);
+        }
       })
       .catch(() => {
         // Guest user
@@ -622,6 +630,7 @@ export default function VerdoraCafe({ onSwitchToCatalog, onSwitchToAdmin }) {
         showToast(`Account created! Welcome to Verdora, ${res.data.name}! 🌿`);
       }
       setCurrentUser(res.data);
+      if (onAuthSuccess) onAuthSuccess(res.data);
       setIsAuthOpen(false);
       setAuthForm({ name: '', email: '', password: '' });
     } catch (err) {
@@ -636,6 +645,7 @@ export default function VerdoraCafe({ onSwitchToCatalog, onSwitchToAdmin }) {
       await apiLogout();
     } catch (e) {}
     setCurrentUser(null);
+    if (onAuthSuccess) onAuthSuccess(null);
     showToast('You have signed out of Verdora.');
   };
 
@@ -711,28 +721,35 @@ export default function VerdoraCafe({ onSwitchToCatalog, onSwitchToAdmin }) {
               )}
             </button>
 
-            {/* Orders Icon / Link for Logged In Customer */}
-            {currentUser && (
-              <>
-                <button
-                  className="vrd-btn-login"
-                  style={{ padding: '6px 14px', fontSize: '0.75rem', gap: '6px' }}
-                  title="View My Order History"
-                  onClick={handleOpenOrdersModal}
-                >
-                  <Package size={14} />
-                  <span>My Orders</span>
-                </button>
-                <button
-                  className="vrd-btn-login"
-                  style={{ padding: '6px 14px', fontSize: '0.75rem', gap: '6px' }}
-                  title="View My Table Reservations"
-                  onClick={handleOpenReservationsModal}
-                >
-                  <Calendar size={14} />
-                  <span>My Bookings</span>
-                </button>
-                {currentUser?.role === 'admin' && (
+            {/* Authenticated User Actions & Profile */}
+            {currentUser ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {/* Regular Customers Only: My Orders & My Bookings */}
+                {currentUser.role !== 'admin' && (
+                  <>
+                    <button
+                      className="vrd-btn-login"
+                      style={{ padding: '6px 14px', fontSize: '0.75rem', gap: '6px' }}
+                      title="View My Order History"
+                      onClick={handleOpenOrdersModal}
+                    >
+                      <Package size={14} />
+                      <span>My Orders</span>
+                    </button>
+                    <button
+                      className="vrd-btn-login"
+                      style={{ padding: '6px 14px', fontSize: '0.75rem', gap: '6px' }}
+                      title="View My Table Reservations"
+                      onClick={handleOpenReservationsModal}
+                    >
+                      <Calendar size={14} />
+                      <span>My Bookings</span>
+                    </button>
+                  </>
+                )}
+
+                {/* Admins Only: Direct Dashboard Button */}
+                {currentUser.role === 'admin' && (
                   <button
                     className="vrd-btn-login"
                     style={{
@@ -748,30 +765,63 @@ export default function VerdoraCafe({ onSwitchToCatalog, onSwitchToAdmin }) {
                     onClick={onSwitchToAdmin}
                   >
                     <ShieldCheck size={14} />
-                    <span>Admin Console</span>
+                    <span>Dashboard</span>
                   </button>
                 )}
-              </>
-            )}
 
+                {/* Profile Button - Replaces Login/SignUp Button */}
+                <button
+                  className="vrd-btn-login"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    color: '#ffffff',
+                    borderColor: 'rgba(16, 185, 129, 0.5)',
+                    background: 'rgba(16, 185, 129, 0.15)',
+                    padding: '6px 14px',
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                  onClick={onSwitchToProfile}
+                  title="View and Edit Your Profile"
+                >
+                  <User size={14} color="var(--vrd-emerald)" />
+                  <span>Profile</span>
+                  {currentUser.role === 'admin' && (
+                    <span
+                      style={{
+                        fontSize: '0.62rem',
+                        padding: '1px 5px',
+                        borderRadius: '6px',
+                        background: 'rgba(207, 161, 105, 0.3)',
+                        color: 'var(--vrd-gold)',
+                        fontWeight: 800,
+                        textTransform: 'uppercase',
+                        marginLeft: '2px',
+                      }}
+                    >
+                      Admin
+                    </span>
+                  )}
+                </button>
 
-            {/* Login / User Status */}
-            {currentUser ? (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  color: 'var(--vrd-gold)',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                }}
-                onClick={handleSignOut}
-                title="Click to Sign Out"
-              >
-                <User size={16} />
-                <span>{currentUser.name}</span>
-                <span style={{ fontSize: '0.7rem', opacity: 0.7 }}>(Sign Out)</span>
+                {/* Sign Out Button */}
+                <button
+                  className="vrd-btn-login"
+                  style={{
+                    padding: '6px 10px',
+                    fontSize: '0.72rem',
+                    opacity: 0.75,
+                    background: 'transparent',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                  }}
+                  onClick={handleSignOut}
+                  title="Sign Out"
+                >
+                  Sign Out
+                </button>
               </div>
             ) : (
               <button
@@ -846,6 +896,30 @@ export default function VerdoraCafe({ onSwitchToCatalog, onSwitchToAdmin }) {
             >
               Visit Us
             </button>
+
+            {/* Admin Dashboard Navbar Link */}
+            {currentUser?.role === 'admin' && (
+              <button
+                style={{
+                  color: 'var(--vrd-gold)',
+                  fontWeight: 700,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'rgba(207, 161, 105, 0.15)',
+                  padding: '6px 16px',
+                  borderRadius: '20px',
+                  border: '1px solid rgba(207, 161, 105, 0.45)',
+                  cursor: 'pointer',
+                  transition: 'all 0.25s ease',
+                }}
+                onClick={onSwitchToAdmin}
+                title="Open Admin Dashboard"
+              >
+                <ShieldCheck size={14} />
+                <span>Dashboard</span>
+              </button>
+            )}
           </nav>
 
           {/* Right Action: Hotline & Book Table CTA */}
