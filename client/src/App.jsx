@@ -28,7 +28,13 @@ export default function App() {
   useEffect(() => {
     apiGetMe()
       .then((res) => {
-        if (res?.data) setCurrentUser(res.data);
+        const u = res?.data?.user || res?.data;
+        if (u) {
+          setCurrentUser(u);
+          if (u.role === 'admin' && (!window.location.hash || window.location.hash === '')) {
+            navigateTo(VIEW_MODES.ADMIN_DASHBOARD, 'admin');
+          }
+        }
       })
       .catch(() => {
         setCurrentUser(null);
@@ -56,7 +62,12 @@ export default function App() {
           onSwitchToCatalog={() => navigateTo(VIEW_MODES.DATABASE_CATALOG, 'catalog')}
           onSwitchToAdmin={() => navigateTo(VIEW_MODES.ADMIN_DASHBOARD, 'admin')}
           onSwitchToProfile={() => navigateTo(VIEW_MODES.PROFILE, 'profile')}
-          onAuthSuccess={(user) => setCurrentUser(user)}
+          onAuthSuccess={(user) => {
+            setCurrentUser(user);
+            if (user?.role === 'admin') {
+              navigateTo(VIEW_MODES.ADMIN_DASHBOARD, 'admin');
+            }
+          }}
         />
       )}
 
