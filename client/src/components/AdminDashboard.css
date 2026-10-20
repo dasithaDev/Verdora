@@ -1,0 +1,342 @@
+/* ==========================================================================
+   VERDORA CAFE - ADMIN OPERATIONAL DASHBOARD STYLES
+   Color Palette: Deep Forest #0c120e, Botanical Green #10b981, Warm Gold #cfa169
+   ========================================================================== */
+
+.vrd-admin-root {
+  min-height: 100vh;
+  background: #090e0b;
+  color: #e5ece6;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  padding-bottom: 60px;
+}
+
+/* Header & Navigation Bar */
+.vrd-admin-header {
+  background: rgba(12, 18, 14, 0.95);
+  border-bottom: 1px solid rgba(207, 161, 105, 0.2);
+  padding: 16px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(20px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.vrd-admin-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vrd-admin-logo-badge {
+  background: linear-gradient(135deg, var(--vrd-emerald, #10b981), #059669);
+  color: #0c120e;
+  font-weight: 900;
+  font-size: 1.1rem;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+}
+
+.vrd-admin-title {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.vrd-admin-sub {
+  font-size: 0.75rem;
+  color: var(--vrd-gold, #cfa169);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+/* Metric KPI Summary Grid */
+.vrd-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin: 28px 0;
+}
+
+.vrd-kpi-card {
+  background: rgba(18, 27, 21, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 22px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.vrd-kpi-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(16, 185, 129, 0.35);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.vrd-kpi-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.vrd-kpi-icon-wrap.gold {
+  background: rgba(207, 161, 105, 0.15);
+  color: var(--vrd-gold, #cfa169);
+  border: 1px solid rgba(207, 161, 105, 0.3);
+}
+
+.vrd-kpi-icon-wrap.emerald {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--vrd-emerald, #10b981);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.vrd-kpi-icon-wrap.blue {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.vrd-kpi-icon-wrap.purple {
+  background: rgba(168, 85, 247, 0.15);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.vrd-kpi-label {
+  font-size: 0.78rem;
+  color: #8fa194;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.vrd-kpi-value {
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: #ffffff;
+  font-family: 'Outfit', sans-serif;
+  line-height: 1.1;
+}
+
+/* Tab Navigation */
+.vrd-admin-tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 24px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.vrd-admin-tab-btn {
+  background: transparent;
+  border: none;
+  color: #8fa194;
+  padding: 12px 20px;
+  border-radius: 10px 10px 0 0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  position: relative;
+  white-space: nowrap;
+}
+
+.vrd-admin-tab-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.vrd-admin-tab-btn.active {
+  color: var(--vrd-emerald, #10b981);
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.vrd-admin-tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--vrd-emerald, #10b981);
+  border-radius: 3px;
+}
+
+/* Controls Toolbar (Filter, Search, Action Button) */
+.vrd-admin-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.vrd-filter-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.vrd-chip {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #a3b3a8;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vrd-chip:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.vrd-chip.active {
+  background: var(--vrd-emerald, #10b981);
+  color: #0c120e;
+  border-color: var(--vrd-emerald, #10b981);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+}
+
+/* Operational Tables & Cards */
+.vrd-admin-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.vrd-admin-table-view {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+}
+
+.vrd-admin-table-view th {
+  padding: 12px 18px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #7d8f82;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  text-align: left;
+  border: none;
+}
+
+.vrd-admin-table-view tr td {
+  background: rgba(18, 27, 21, 0.7);
+  padding: 16px 18px;
+  font-size: 0.88rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.vrd-admin-table-view tr td:first-child {
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px 0 0 12px;
+}
+
+.vrd-admin-table-view tr td:last-child {
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 0 12px 12px 0;
+}
+
+/* Action Buttons */
+.vrd-btn-admin-action {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34d399;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.vrd-btn-admin-action:hover {
+  background: var(--vrd-emerald, #10b981);
+  color: #0c120e;
+}
+
+.vrd-btn-admin-delete {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #f87171;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.vrd-btn-admin-delete:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+/* Form Groups & Inputs in Modals */
+.vrd-admin-modal-box {
+  background: #0f1712;
+  border: 1px solid rgba(207, 161, 105, 0.3);
+  border-radius: 16px;
+  padding: 32px;
+  width: 90%;
+  max-width: 580px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Empty State Box */
+.vrd-empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: rgba(18, 27, 21, 0.4);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  color: #8fa194;
+}
+
+.vrd-empty-state h4 {
+  color: #ffffff;
+  margin: 12px 0 6px;
+  font-size: 1.15rem;
+}

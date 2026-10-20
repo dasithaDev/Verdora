@@ -311,7 +311,7 @@ const JOURNAL_POSTS = [
   },
 ];
 
-export default function VerdoraCafe({ onSwitchToCatalog }) {
+export default function VerdoraCafe({ onSwitchToCatalog, onSwitchToAdmin }) {
   // Navigation & Scroll
   const [activeSection, setActiveSection] = useState('home');
 
@@ -732,6 +732,25 @@ export default function VerdoraCafe({ onSwitchToCatalog }) {
                   <Calendar size={14} />
                   <span>My Bookings</span>
                 </button>
+                {currentUser?.role === 'admin' && (
+                  <button
+                    className="vrd-btn-login"
+                    style={{
+                      padding: '6px 14px',
+                      fontSize: '0.75rem',
+                      gap: '6px',
+                      background: 'rgba(207, 161, 105, 0.16)',
+                      borderColor: 'var(--vrd-gold)',
+                      color: 'var(--vrd-gold)',
+                      fontWeight: 700,
+                    }}
+                    title="Access Operations & Admin Analytics"
+                    onClick={onSwitchToAdmin}
+                  >
+                    <ShieldCheck size={14} />
+                    <span>Admin Console</span>
+                  </button>
+                )}
               </>
             )}
 

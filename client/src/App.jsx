@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import VerdoraCafe from './components/VerdoraCafe';
 import MenuPage from './components/MenuPage';
+import AdminDashboard from './components/AdminDashboard';
 import './components/MenuPage.css';
 
 const VIEW_MODES = {
   CAFE_HOME: 'cafe_home',
   DATABASE_CATALOG: 'database_catalog',
+  ADMIN_DASHBOARD: 'admin_dashboard',
 };
 
 export default function App() {
@@ -13,9 +15,18 @@ export default function App() {
 
   return (
     <div className="app-root">
-      {currentView === VIEW_MODES.CAFE_HOME ? (
-        <VerdoraCafe onSwitchToCatalog={() => setCurrentView(VIEW_MODES.DATABASE_CATALOG)} />
-      ) : (
+      {currentView === VIEW_MODES.CAFE_HOME && (
+        <VerdoraCafe
+          onSwitchToCatalog={() => setCurrentView(VIEW_MODES.DATABASE_CATALOG)}
+          onSwitchToAdmin={() => setCurrentView(VIEW_MODES.ADMIN_DASHBOARD)}
+        />
+      )}
+
+      {currentView === VIEW_MODES.ADMIN_DASHBOARD && (
+        <AdminDashboard onBackToCafe={() => setCurrentView(VIEW_MODES.CAFE_HOME)} />
+      )}
+
+      {currentView === VIEW_MODES.DATABASE_CATALOG && (
         <div style={{ minHeight: '100vh', background: '#0c120e' }}>
           {/* Back Bar — styled to match VerdoraCafe navbar */}
           <div style={{
