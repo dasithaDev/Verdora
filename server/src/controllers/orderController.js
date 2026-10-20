@@ -92,7 +92,7 @@ export const createOrder = async (req, res, next) => {
  * Customer: Retrieve own order history.
  * Supports pagination (page, limit).
  */
-export const getMyOrders = async (req, res) => {
+export const getMyOrders = async (req, res, next) => {
   try {
     const userId = req.user._id || req.user.id;
     const { page, limit, skip } = req.pagination;
@@ -116,7 +116,7 @@ export const getMyOrders = async (req, res) => {
       },
     });
   } catch (error) {
-    return sendError(res, 500, 'INTERNAL_SERVER_ERROR', error.message);
+    next(error);
   }
 };
 
@@ -124,7 +124,7 @@ export const getMyOrders = async (req, res) => {
  * Customer / Admin: Retrieve order details by ID.
  * Ownership check: Customers can only access their own orders. Admins can view any order.
  */
-export const getOrderById = async (req, res) => {
+export const getOrderById = async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -148,7 +148,7 @@ export const getOrderById = async (req, res) => {
 
     return sendSuccess(res, 200, order);
   } catch (error) {
-    return sendError(res, 500, 'INTERNAL_SERVER_ERROR', error.message);
+    next(error);
   }
 };
 
@@ -156,7 +156,7 @@ export const getOrderById = async (req, res) => {
  * Customer / Owner: Cancel an eligible order.
  * Policy: Orders can only be cancelled while in 'placed' status (before preparation starts).
  */
-export const cancelOrder = async (req, res) => {
+export const cancelOrder = async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -201,14 +201,14 @@ export const cancelOrder = async (req, res) => {
 
     return sendSuccess(res, 200, order);
   } catch (error) {
-    return sendError(res, 500, 'INTERNAL_SERVER_ERROR', error.message);
+    next(error);
   }
 };
 
 /**
  * Admin: List all cafe orders with status filter and pagination.
  */
-export const getAllOrdersAdmin = async (req, res) => {
+export const getAllOrdersAdmin = async (req, res, next) => {
   try {
     const { page, limit, skip } = req.pagination;
     const { status, userId } = req.query;
@@ -243,7 +243,7 @@ export const getAllOrdersAdmin = async (req, res) => {
       },
     });
   } catch (error) {
-    return sendError(res, 500, 'INTERNAL_SERVER_ERROR', error.message);
+    next(error);
   }
 };
 

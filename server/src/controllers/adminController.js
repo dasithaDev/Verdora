@@ -3,13 +3,13 @@ import Reservation from '../models/Reservation.js';
 import MenuItem from '../models/MenuItem.js';
 import User from '../models/User.js';
 import CafeTable from '../models/CafeTable.js';
-import { sendSuccess, sendError } from '../utils/response.js';
+import { sendSuccess } from '../utils/response.js';
 
 /**
  * GET /api/v1/admin/stats
  * Aggregates live cafe performance metrics for the admin dashboard
  */
-export const getDashboardStats = async (req, res) => {
+export const getDashboardStats = async (req, res, next) => {
   try {
     const today = new Date();
     const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -130,7 +130,6 @@ export const getDashboardStats = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Error computing dashboard statistics:', error);
-    return sendError(res, 500, 'SERVER_ERROR', 'Failed to retrieve dashboard statistics');
+    next(error);
   }
 };
