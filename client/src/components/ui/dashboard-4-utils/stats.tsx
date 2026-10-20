@@ -1,7 +1,5 @@
 import * as React from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { TrendingUp, ShoppingBag, Users, Calendar, UtensilsCrossed } from "lucide-react"
+import { TrendingUp, ShoppingBag, Calendar, UtensilsCrossed } from "lucide-react"
 
 export function DashboardStats({ stats }: { stats?: any }) {
   const revenue = stats?.summary?.totalRevenue || 128450
@@ -10,74 +8,66 @@ export function DashboardStats({ stats }: { stats?: any }) {
   const activeDishes = stats?.menu?.activeAvailable || 24
 
   return (
-    <div className="col-span-full grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <Card className="border-border/60 bg-card/80 backdrop-blur-sm shadow-md">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">Total Revenue</CardTitle>
-          <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
-            <TrendingUp className="h-4 w-4" />
+    <div className="dashboard-4-stats-grid">
+      {/* Total Revenue */}
+      <div className="dashboard-stat-card">
+        <div className="dashboard-stat-header">
+          <span className="dashboard-stat-label">Total Revenue</span>
+          <div className="dashboard-stat-icon emerald">
+            <TrendingUp size={16} />
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold tracking-tight">Rs. {revenue.toLocaleString()}</div>
-          <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground">
-            <Badge variant="secondary" className="bg-emerald-500/15 text-emerald-400 font-semibold text-[10px] px-1.5 py-0.5">
-              +14.2%
-            </Badge>
-            <span>vs previous week</span>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="dashboard-stat-value">Rs. {revenue.toLocaleString()}</div>
+        <div className="dashboard-stat-footer">
+          <span className="dashboard-stat-badge emerald">+14.2%</span>
+          <span className="dashboard-stat-hint">vs previous week</span>
+        </div>
+      </div>
 
-      <Card className="border-border/60 bg-card/80 backdrop-blur-sm shadow-md">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">Kitchen Queue</CardTitle>
-          <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">
-            <ShoppingBag className="h-4 w-4" />
+      {/* Kitchen Queue */}
+      <div className="dashboard-stat-card">
+        <div className="dashboard-stat-header">
+          <span className="dashboard-stat-label">Kitchen Queue</span>
+          <div className="dashboard-stat-icon amber">
+            <ShoppingBag size={16} />
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold tracking-tight">{activeOrders} Tickets</div>
-          <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground">
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-            <span>Active preparation</span>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="dashboard-stat-value">{activeOrders} Tickets</div>
+        <div className="dashboard-stat-footer">
+          <span className="dashboard-stat-pulse" />
+          <span className="dashboard-stat-hint">Active preparation</span>
+        </div>
+      </div>
 
-      <Card className="border-border/60 bg-card/80 backdrop-blur-sm shadow-md">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">Today's Bookings</CardTitle>
-          <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
-            <Calendar className="h-4 w-4" />
+      {/* Today's Bookings */}
+      <div className="dashboard-stat-card">
+        <div className="dashboard-stat-header">
+          <span className="dashboard-stat-label">Today's Bookings</span>
+          <div className="dashboard-stat-icon emerald">
+            <Calendar size={16} />
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold tracking-tight">{bookings} Tables</div>
-          <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground">
-            <Badge variant="secondary" className="bg-emerald-500/15 text-emerald-400 font-semibold text-[10px] px-1.5 py-0.5">
-              88% Capacity
-            </Badge>
-            <span>Confirmed</span>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="dashboard-stat-value">{bookings} Tables</div>
+        <div className="dashboard-stat-footer">
+          <span className="dashboard-stat-badge emerald">88% Capacity</span>
+          <span className="dashboard-stat-hint">Confirmed</span>
+        </div>
+      </div>
 
-      <Card className="border-border/60 bg-card/80 backdrop-blur-sm shadow-md">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">Active Menu Items</CardTitle>
-          <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">
-            <UtensilsCrossed className="h-4 w-4" />
+      {/* Active Menu Items */}
+      <div className="dashboard-stat-card">
+        <div className="dashboard-stat-header">
+          <span className="dashboard-stat-label">Active Menu Items</span>
+          <div className="dashboard-stat-icon amber">
+            <UtensilsCrossed size={16} />
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold tracking-tight">{activeDishes} Dishes</div>
-          <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground">
-            <span className="text-emerald-400 font-medium">100% In Stock</span>
-            <span>in kitchen inventory</span>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="dashboard-stat-value">{activeDishes} Dishes</div>
+        <div className="dashboard-stat-footer">
+          <span className="dashboard-stat-accent">100% In Stock</span>
+          <span className="dashboard-stat-hint">in kitchen inventory</span>
+        </div>
+      </div>
     </div>
   )
 }
