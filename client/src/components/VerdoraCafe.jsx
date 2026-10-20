@@ -316,6 +316,7 @@ export default function VerdoraCafe({
   onSwitchToAdmin,
   onSwitchToProfile,
   onAuthSuccess,
+  currentUser: propCurrentUser,
 }) {
   // Navigation & Scroll
   const [activeSection, setActiveSection] = useState('home');
@@ -349,7 +350,13 @@ export default function VerdoraCafe({
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login');
   const [authForm, setAuthForm] = useState({ name: '', email: '', password: '' });
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(propCurrentUser || null);
+
+  useEffect(() => {
+    if (propCurrentUser !== undefined) {
+      setCurrentUser(propCurrentUser);
+    }
+  }, [propCurrentUser]);
 
   // Orders State (Phase 06)
   const [dbMenuItems, setDbMenuItems] = useState([]);
@@ -383,7 +390,6 @@ export default function VerdoraCafe({
         const userData = res?.data?.user || res?.data;
         if (userData && (userData.role || userData.name)) {
           setCurrentUser(userData);
-          if (onAuthSuccess) onAuthSuccess(userData);
         }
       })
       .catch(() => {
@@ -622,6 +628,13 @@ export default function VerdoraCafe({
     }
 
     try {
+      let res;
+      if (authMode === 'login') {
+        res = await apiLogin({ email: authForm.email, password: authForm.password });
+      } else {
+        res = await apiRegister({ name: authForm.name, email: authForm.email, password: authForm.password });
+      }
+
       const userData = res?.data?.user || res?.data;
       const userName = userData?.name || 'Member';
       showToast(authMode === 'login' ? `Welcome back, ${userName}! 👋` : `Account created! Welcome to Verdora, ${userName}! 🌿`);
@@ -630,11 +643,6 @@ export default function VerdoraCafe({
       if (onAuthSuccess) onAuthSuccess(userData);
       setIsAuthOpen(false);
       setAuthForm({ name: '', email: '', password: '' });
-
-      // If admin, immediately transition to the admin dashboard
-      if (userData?.role === 'admin' && onSwitchToAdmin) {
-        onSwitchToAdmin();
-      }
     } catch (err) {
       const errMsg = err?.response?.data?.error?.message || err.message || 'Authentication failed';
       showToast(`❌ ${errMsg}`);

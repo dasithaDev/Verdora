@@ -31,9 +31,6 @@ export default function App() {
         const u = res?.data?.user || res?.data;
         if (u) {
           setCurrentUser(u);
-          if (u.role === 'admin' && (!window.location.hash || window.location.hash === '')) {
-            navigateTo(VIEW_MODES.ADMIN_DASHBOARD, 'admin');
-          }
         }
       })
       .catch(() => {
@@ -59,14 +56,12 @@ export default function App() {
     <div className="app-root">
       {currentView === VIEW_MODES.CAFE_HOME && (
         <VerdoraCafe
+          currentUser={currentUser}
           onSwitchToCatalog={() => navigateTo(VIEW_MODES.DATABASE_CATALOG, 'catalog')}
           onSwitchToAdmin={() => navigateTo(VIEW_MODES.ADMIN_DASHBOARD, 'admin')}
           onSwitchToProfile={() => navigateTo(VIEW_MODES.PROFILE, 'profile')}
           onAuthSuccess={(user) => {
             setCurrentUser(user);
-            if (user?.role === 'admin') {
-              navigateTo(VIEW_MODES.ADMIN_DASHBOARD, 'admin');
-            }
           }}
         />
       )}
