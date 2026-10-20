@@ -11,19 +11,40 @@ const VIEW_MODES = {
 };
 
 export default function App() {
-  const [currentView, setCurrentView] = useState(VIEW_MODES.CAFE_HOME);
+  const getInitialView = () => {
+    if (window.location.hash === '#admin') return VIEW_MODES.ADMIN_DASHBOARD;
+    if (window.location.hash === '#catalog') return VIEW_MODES.DATABASE_CATALOG;
+    return VIEW_MODES.CAFE_HOME;
+  };
+
+  const [currentView, setCurrentView] = useState(getInitialView);
+
+  React.useEffect(() => {
+    const handleHash = () => {
+      if (window.location.hash === '#admin') setCurrentView(VIEW_MODES.ADMIN_DASHBOARD);
+      else if (window.location.hash === '#catalog') setCurrentView(VIEW_MODES.DATABASE_CATALOG);
+      else if (!window.location.hash) setCurrentView(VIEW_MODES.CAFE_HOME);
+    };
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
+
+  const navigateTo = (view, hash = '') => {
+    window.location.hash = hash;
+    setCurrentView(view);
+  };
 
   return (
     <div className="app-root">
       {currentView === VIEW_MODES.CAFE_HOME && (
         <VerdoraCafe
-          onSwitchToCatalog={() => setCurrentView(VIEW_MODES.DATABASE_CATALOG)}
-          onSwitchToAdmin={() => setCurrentView(VIEW_MODES.ADMIN_DASHBOARD)}
+          onSwitchToCatalog={() => navigateTo(VIEW_MODES.DATABASE_CATALOG, 'catalog')}
+          onSwitchToAdmin={() => navigateTo(VIEW_MODES.ADMIN_DASHBOARD, 'admin')}
         />
       )}
 
       {currentView === VIEW_MODES.ADMIN_DASHBOARD && (
-        <AdminDashboard onBackToCafe={() => setCurrentView(VIEW_MODES.CAFE_HOME)} />
+        <AdminDashboard onBackToCafe={() => navigateTo(VIEW_MODES.CAFE_HOME, '')} />
       )}
 
       {currentView === VIEW_MODES.DATABASE_CATALOG && (
@@ -42,7 +63,7 @@ export default function App() {
           }}>
             <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <button
-                onClick={() => setCurrentView(VIEW_MODES.CAFE_HOME)}
+                onClick={() => navigateTo(VIEW_MODES.CAFE_HOME, '')}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
