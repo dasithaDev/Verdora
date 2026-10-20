@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { TrendingUp } from "lucide-react"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
 const chartData = [
@@ -26,14 +26,15 @@ const chartConfig = {
 
 export function RevenueChart() {
   return (
-    <Card className="col-span-full lg:col-span-2 border-border/60 bg-card/80 backdrop-blur-sm shadow-md">
-      <CardHeader className="flex flex-row items-center justify-between pb-4">
-        <div>
-          <CardTitle className="text-base font-semibold">Weekly Revenue Trend</CardTitle>
-          <CardDescription>Daily gross sales and order volume across the current week</CardDescription>
+    <div className="dashboard-card">
+      <div className="dashboard-card-header">
+        <div className="dashboard-card-title-row">
+          <TrendingUp size={18} className="dashboard-card-icon emerald" />
+          <h3 className="dashboard-card-title">Weekly Revenue Trend</h3>
         </div>
-      </CardHeader>
-      <CardContent className="px-2 pt-2 sm:px-6 sm:pt-4">
+        <p className="dashboard-card-desc">Daily gross sales and order volume across the current week</p>
+      </div>
+      <div className="dashboard-card-content">
         <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
           <AreaChart data={chartData} margin={{ left: 12, right: 12 }}>
             <defs>
@@ -60,7 +61,7 @@ export function RevenueChart() {
             />
           </AreaChart>
         </ChartContainer>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

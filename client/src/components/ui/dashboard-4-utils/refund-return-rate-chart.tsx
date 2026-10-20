@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { CheckCircle2 } from "lucide-react"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
 const chartData = [
@@ -26,14 +26,15 @@ const chartConfig = {
 
 export function RefundReturnRateChart() {
   return (
-    <Card className="col-span-full md:col-span-1 lg:col-span-2 border-border/60 bg-card/80 backdrop-blur-sm shadow-md">
-      <CardHeader className="flex flex-row items-center justify-between pb-4">
-        <div>
-          <CardTitle className="text-base font-semibold">Fulfillment vs Return Rate</CardTitle>
-          <CardDescription>Order delivery success rate with 97.2% completion</CardDescription>
+    <div className="dashboard-card">
+      <div className="dashboard-card-header">
+        <div className="dashboard-card-title-row">
+          <CheckCircle2 size={18} className="dashboard-card-icon emerald" />
+          <h3 className="dashboard-card-title">Fulfillment vs Return Rate</h3>
         </div>
-      </CardHeader>
-      <CardContent className="px-2 pt-2 sm:px-6 sm:pt-4">
+        <p className="dashboard-card-desc">Order delivery success rate with 97.2% completion</p>
+      </div>
+      <div className="dashboard-card-content">
         <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
           <BarChart data={chartData} margin={{ left: 12, right: 12 }}>
             <CartesianGrid vertical={false} strokeDasharray="3 3" opacity={0.2} />
@@ -43,7 +44,7 @@ export function RefundReturnRateChart() {
             <Bar dataKey="cancelled" fill="hsl(0, 84%, 60%)" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ChartContainer>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }
