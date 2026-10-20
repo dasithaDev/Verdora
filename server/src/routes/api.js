@@ -5,6 +5,7 @@ import menuRoutes from './menuRoutes.js';
 import orderRoutes from './orderRoutes.js';
 import reservationRoutes from './reservationRoutes.js';
 import tableRoutes from './tableRoutes.js';
+import adminRoutes from './adminRoutes.js';
 import { protect, requireRole } from '../middleware/authMiddleware.js';
 import { validateObjectId, validatePagination } from '../middleware/validate.js';
 import { getAllOrdersAdmin, updateOrderStatusAdmin } from '../controllers/orderController.js';
@@ -19,6 +20,7 @@ apiRouter.use('/menu', menuRoutes);
 apiRouter.use('/orders', orderRoutes);
 apiRouter.use('/reservations', reservationRoutes);
 apiRouter.use('/tables', tableRoutes);
+apiRouter.use('/admin', adminRoutes);
 
 // Admin order management — mounted here to avoid /:id shadow conflict inside orderRoutes.js
 apiRouter.get('/admin/orders', protect, requireRole('admin'), validatePagination, getAllOrdersAdmin);

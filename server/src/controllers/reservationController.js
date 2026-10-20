@@ -177,9 +177,6 @@ export const getMyReservations = async (req, res, next) => {
 export const getReservationById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return sendError(res, 400, 'VALIDATION_ERROR', 'Malformed reservation ID');
-    }
 
     const reservation = await Reservation.findById(id)
       .populate('tableId', 'tableNumber capacity')
@@ -189,8 +186,8 @@ export const getReservationById = async (req, res, next) => {
       return sendError(res, 404, 'NOT_FOUND', 'Reservation not found');
     }
 
-    // Ownership check
-    const isOwner = reservation.userId._id.toString() === req.user._id.toString();
+    // Ownership check — userId is populated as an object; use _id from the populated doc
+    const isOwner = (reservation.userId?._id ?? reservation.userId).toString() === req.user._id.toString();
     const isAdmin = req.user.role === 'admin';
 
     if (!isOwner && !isAdmin) {
@@ -210,9 +207,6 @@ export const getReservationById = async (req, res, next) => {
 export const updateReservation = async (req, res, next) => {
   try {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return sendError(res, 400, 'VALIDATION_ERROR', 'Malformed reservation ID');
-    }
 
     const reservation = await Reservation.findById(id);
     if (!reservation) {
@@ -312,9 +306,6 @@ export const updateReservation = async (req, res, next) => {
 export const cancelReservation = async (req, res, next) => {
   try {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return sendError(res, 400, 'VALIDATION_ERROR', 'Malformed reservation ID');
-    }
 
     const reservation = await Reservation.findById(id);
     if (!reservation) {

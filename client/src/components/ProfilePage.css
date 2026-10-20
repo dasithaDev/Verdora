@@ -1,0 +1,472 @@
+/* ==========================================================================
+   VERDORA CAFE - PROFILE PAGE STYLES
+   Dark Botanical Palette: Deep Forest #090e0b / #0c120e, Emerald #10b981, Gold #cfa169
+   ========================================================================== */
+
+.vrd-profile-root {
+  min-height: 100vh;
+  background: #090e0b;
+  color: #e5ece6;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  padding-bottom: 70px;
+}
+
+/* Header bar matching Verdora navbar */
+.vrd-profile-header {
+  background: rgba(12, 18, 14, 0.95);
+  border-bottom: 1px solid rgba(207, 161, 105, 0.2);
+  padding: 16px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.vrd-profile-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vrd-profile-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(207, 161, 105, 0.08);
+  border: 1px solid rgba(207, 161, 105, 0.35);
+  color: #cfa169;
+  padding: 8px 18px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.vrd-profile-btn-ghost:hover {
+  background: #cfa169;
+  color: #0c120e;
+  transform: translateY(-1px);
+}
+
+.vrd-profile-btn-gold {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #cfa169, #b58950);
+  border: none;
+  color: #0c120e;
+  padding: 8px 18px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 14px rgba(207, 161, 105, 0.25);
+}
+
+.vrd-profile-btn-gold:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(207, 161, 105, 0.4);
+}
+
+/* Container */
+.vrd-profile-container {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 32px 20px;
+}
+
+/* Hero Profile Banner */
+.vrd-profile-hero {
+  background: linear-gradient(145deg, rgba(20, 32, 24, 0.75), rgba(12, 18, 14, 0.95));
+  border: 1px solid rgba(207, 161, 105, 0.22);
+  border-radius: 20px;
+  padding: 32px 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  position: relative;
+  overflow: hidden;
+}
+
+.vrd-profile-hero::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.vrd-profile-hero-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.vrd-profile-avatar {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #0c120e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 2rem;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.25), 0 8px 24px rgba(16, 185, 129, 0.35);
+  flex-shrink: 0;
+}
+
+.vrd-profile-avatar.admin-avatar {
+  background: linear-gradient(135deg, #cfa169, #b58950);
+  box-shadow: 0 0 0 4px rgba(207, 161, 105, 0.3), 0 8px 24px rgba(207, 161, 105, 0.35);
+}
+
+.vrd-profile-hero-name {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.01em;
+}
+
+.vrd-profile-hero-email {
+  color: #9fa6a1;
+  font-size: 0.92rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.vrd-profile-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.vrd-role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.vrd-role-badge.admin {
+  background: rgba(207, 161, 105, 0.2);
+  color: #cfa169;
+  border: 1px solid rgba(207, 161, 105, 0.4);
+}
+
+.vrd-role-badge.customer {
+  background: rgba(16, 185, 129, 0.18);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.vrd-since-badge {
+  color: #7d8781;
+  font-size: 0.8rem;
+}
+
+/* Grid Layout for Profile Sections */
+.vrd-profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 860px) {
+  .vrd-profile-grid {
+    grid-template-columns: 1fr;
+  }
+  .vrd-profile-hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Card Style */
+.vrd-profile-card {
+  background: rgba(14, 22, 17, 0.85);
+  border: 1px solid rgba(207, 161, 105, 0.16);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.vrd-profile-card:hover {
+  border-color: rgba(207, 161, 105, 0.3);
+}
+
+.vrd-profile-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.vrd-profile-card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* Form Groups & Inputs */
+.vrd-pform-group {
+  margin-bottom: 16px;
+}
+
+.vrd-pform-group label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #9fa6a1;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+
+.vrd-pinput {
+  width: 100%;
+  background: rgba(8, 12, 9, 0.85);
+  border: 1px solid rgba(207, 161, 105, 0.25);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.vrd-pinput:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+.vrd-pinput:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* Dietary Tags */
+.vrd-diet-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.vrd-diet-tag {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: #a3e0c0;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.vrd-diet-tag.active {
+  background: #10b981;
+  border-color: #10b981;
+  color: #0c120e;
+  font-weight: 700;
+}
+
+/* Shortcut Items for Admin/Customer */
+.vrd-shortcut-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.vrd-shortcut-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(8, 12, 9, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vrd-shortcut-item:hover {
+  background: rgba(207, 161, 105, 0.08);
+  border-color: rgba(207, 161, 105, 0.35);
+  transform: translateX(3px);
+}
+
+.vrd-shortcut-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vrd-shortcut-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: rgba(207, 161, 105, 0.15);
+  color: #cfa169;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vrd-shortcut-text strong {
+  display: block;
+  font-size: 0.88rem;
+  color: #ffffff;
+}
+
+.vrd-shortcut-text span {
+  font-size: 0.75rem;
+  color: #9fa6a1;
+}
+
+/* Security Details List */
+.vrd-security-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.vrd-security-meta-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #9fa6a1;
+}
+
+.vrd-security-meta-item span.active {
+  color: #10b981;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Buttons */
+.vrd-btn-save {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border: none;
+  color: #0c120e;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+  width: 100%;
+}
+
+.vrd-btn-save:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.vrd-btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.vrd-btn-danger-outline {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #f87171;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.vrd-btn-danger-outline:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+/* Alert Notification */
+.vrd-profile-alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vrd-profile-alert.success {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #a7f3d0;
+}
+
+.vrd-profile-alert.error {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+}

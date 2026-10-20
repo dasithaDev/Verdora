@@ -268,7 +268,6 @@ export default function MenuPage() {
                     className="btn btn-primary menu-card-btn"
                     onClick={(e) => {
                       e.stopPropagation();
-                      // TODO: Phase 6 — Add to cart
                     }}
                   >
                     Add to Cart

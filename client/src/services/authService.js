@@ -37,3 +37,13 @@ export const getMe = async () => {
   const response = await apiClient.get('/auth/me');
   return response.data;
 };
+
+/**
+ * Update authenticated user's profile details or password.
+ * @param {Object} data - { name, currentPassword?, newPassword? }
+ * @returns {Promise<Object>} API response envelope with updated user
+ */
+export const updateProfile = async (data) => {
+  const response = await apiClient.patch('/auth/profile', data);
+  return response.data;
+};

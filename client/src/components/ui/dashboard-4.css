@@ -1,0 +1,341 @@
+/* ==========================================================================
+   VERDORA CAFE - EXECUTIVE ANALYTICS CONSOLE (DASHBOARD-4)
+   Solves all card cramping, font size inconsistencies, and alignment defects
+   Unified typography: Outfit (Headings) + Plus Jakarta Sans (Body & Labels)
+   ========================================================================== */
+
+.dashboard-4-root {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* ── 4-COLUMN STAT CARDS GRID ───────────────────────────────────────────── */
+.dashboard-4-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  width: 100%;
+}
+
+@media (max-width: 1200px) {
+  .dashboard-4-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-4-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Individual Stat Card */
+.dashboard-stat-card {
+  background: rgba(14, 22, 17, 0.90);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 154px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+.dashboard-stat-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(16, 185, 129, 0.35);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+}
+
+/* Stat Card Top Row: Label + Icon Badge */
+.dashboard-stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.dashboard-stat-label {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #8da191;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.dashboard-stat-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dashboard-stat-icon.emerald {
+  background: rgba(16, 185, 129, 0.14);
+  border: 1px solid rgba(16, 185, 129, 0.30);
+  color: #34d399;
+}
+
+.dashboard-stat-icon.amber {
+  background: rgba(245, 158, 11, 0.14);
+  border: 1px solid rgba(245, 158, 11, 0.30);
+  color: #fbbf24;
+}
+
+/* Stat Value */
+.dashboard-stat-value {
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 10px 0 12px;
+}
+
+/* Stat Card Footer */
+.dashboard-stat-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: #6b8273;
+}
+
+.dashboard-stat-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+}
+
+.dashboard-stat-badge.emerald {
+  background: rgba(16, 185, 129, 0.14);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.30);
+}
+
+.dashboard-stat-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #fbbf24;
+  box-shadow: 0 0 6px #fbbf24;
+  flex-shrink: 0;
+}
+
+.dashboard-stat-accent {
+  color: #34d399;
+  font-weight: 700;
+  font-size: 0.78rem;
+}
+
+.dashboard-stat-hint {
+  color: #7d8f82;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+/* ── 2-COLUMN MAIN CHARTS & ACTIONS GRID ────────────────────────────────── */
+.dashboard-4-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-4-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Standardized Card Container for Charts & Actions */
+.dashboard-card {
+  background: rgba(14, 22, 17, 0.90);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+.dashboard-card:hover {
+  border-color: rgba(16, 185, 129, 0.30);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.45);
+}
+
+/* Standardized Card Header */
+.dashboard-card-header {
+  padding-bottom: 16px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dashboard-card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.dashboard-card-icon {
+  flex-shrink: 0;
+}
+
+.dashboard-card-icon.emerald {
+  color: #34d399;
+}
+
+.dashboard-card-title {
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.18rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.dashboard-card-desc {
+  font-size: 0.82rem;
+  color: #8da191;
+  margin: 0;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+/* Standardized Card Content */
+.dashboard-card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── QUICK ACTIONS LIST ─────────────────────────────────────────────────── */
+.dashboard-quick-actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.dashboard-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  transition: all 0.22s ease;
+}
+
+.dashboard-action-row:hover {
+  background: rgba(255, 255, 255, 0.065);
+  border-color: rgba(16, 185, 129, 0.40);
+  transform: translateX(4px);
+}
+
+.dashboard-action-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  min-width: 0;
+}
+
+.dashboard-action-icon-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dashboard-action-icon-badge.emerald {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #34d399;
+}
+
+.dashboard-action-icon-badge.amber {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #fbbf24;
+}
+
+.dashboard-action-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.dashboard-action-name {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: #f1f5f3;
+  margin-bottom: 2px;
+}
+
+.dashboard-action-hint {
+  font-size: 0.78rem;
+  color: #7d8f82;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dashboard-action-btn {
+  flex-shrink: 0;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.dashboard-action-btn.primary {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #0c120e;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.dashboard-action-btn.primary:hover {
+  background: linear-gradient(135deg, #34d399, #10b981);
+  transform: translateY(-1px);
+}
+
+.dashboard-action-btn.secondary {
+  background: rgba(207, 161, 105, 0.12);
+  color: #cfa169;
+  border-color: rgba(207, 161, 105, 0.35);
+}
+
+.dashboard-action-btn.secondary:hover {
+  background: rgba(207, 161, 105, 0.24);
+  color: #ffffff;
+  border-color: rgba(207, 161, 105, 0.6);
+  transform: translateY(-1px);
+}

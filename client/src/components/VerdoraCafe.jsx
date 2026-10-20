@@ -311,7 +311,13 @@ const JOURNAL_POSTS = [
   },
 ];
 
-export default function VerdoraCafe({ onSwitchToCatalog }) {
+export default function VerdoraCafe({
+  onSwitchToCatalog,
+  onSwitchToAdmin,
+  onSwitchToProfile,
+  onAuthSuccess,
+  currentUser: propCurrentUser,
+}) {
   // Navigation & Scroll
   const [activeSection, setActiveSection] = useState('home');
 
@@ -344,7 +350,13 @@ export default function VerdoraCafe({ onSwitchToCatalog }) {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login');
   const [authForm, setAuthForm] = useState({ name: '', email: '', password: '' });
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(propCurrentUser || null);
+
+  useEffect(() => {
+    if (propCurrentUser !== undefined) {
+      setCurrentUser(propCurrentUser);
+    }
+  }, [propCurrentUser]);
 
   // Orders State (Phase 06)
   const [dbMenuItems, setDbMenuItems] = useState([]);
@@ -375,7 +387,10 @@ export default function VerdoraCafe({ onSwitchToCatalog }) {
   useEffect(() => {
     apiGetMe()
       .then((res) => {
-        if (res?.data) setCurrentUser(res.data);
+        const userData = res?.data?.user || res?.data;
+        if (userData && (userData.role || userData.name)) {
+          setCurrentUser(userData);
+        }
       })
       .catch(() => {
         // Guest user
@@ -616,12 +631,16 @@ export default function VerdoraCafe({ onSwitchToCatalog }) {
       let res;
       if (authMode === 'login') {
         res = await apiLogin({ email: authForm.email, password: authForm.password });
-        showToast(`Welcome back, ${res.data.name}! 👋`);
       } else {
         res = await apiRegister({ name: authForm.name, email: authForm.email, password: authForm.password });
-        showToast(`Account created! Welcome to Verdora, ${res.data.name}! 🌿`);
       }
-      setCurrentUser(res.data);
+
+      const userData = res?.data?.user || res?.data;
+      const userName = userData?.name || 'Member';
+      showToast(authMode === 'login' ? `Welcome back, ${userName}! 👋` : `Account created! Welcome to Verdora, ${userName}! 🌿`);
+
+      setCurrentUser(userData);
+      if (onAuthSuccess) onAuthSuccess(userData);
       setIsAuthOpen(false);
       setAuthForm({ name: '', email: '', password: '' });
     } catch (err) {
@@ -636,6 +655,7 @@ export default function VerdoraCafe({ onSwitchToCatalog }) {
       await apiLogout();
     } catch (e) {}
     setCurrentUser(null);
+    if (onAuthSuccess) onAuthSuccess(null);
     showToast('You have signed out of Verdora.');
   };
 
@@ -687,72 +707,134 @@ export default function VerdoraCafe({ onSwitchToCatalog }) {
           </div>
 
           <div className="vrd-topbar-right">
-            {/* Wishlist Icon */}
-            <button
-              className="vrd-icon-btn"
-              title="Favorites"
-              onClick={() => showToast(`You have ${wishlist.length} items in your wishlist ❤️`)}
-            >
-              <Heart size={18} />
-              {wishlist.length > 0 && (
-                <span className="vrd-badge-count">{wishlist.length}</span>
-              )}
-            </button>
-
-            {/* Shopping Cart Icon */}
-            <button
-              className="vrd-icon-btn"
-              title="Shopping Cart Tray"
-              onClick={() => setIsCartOpen(true)}
-            >
-              <ShoppingBag size={18} />
-              {cartItemCount > 0 && (
-                <span className="vrd-badge-count">{cartItemCount}</span>
-              )}
-            </button>
-
-            {/* Orders Icon / Link for Logged In Customer */}
-            {currentUser && (
+            {/* Wishlist & Shopping Cart only for guests / regular customers */}
+            {currentUser?.role !== 'admin' && (
               <>
                 <button
-                  className="vrd-btn-login"
-                  style={{ padding: '6px 14px', fontSize: '0.75rem', gap: '6px' }}
-                  title="View My Order History"
-                  onClick={handleOpenOrdersModal}
+                  className="vrd-icon-btn"
+                  title="Favorites"
+                  onClick={() => showToast(`You have ${wishlist.length} items in your wishlist ❤️`)}
                 >
-                  <Package size={14} />
-                  <span>My Orders</span>
+                  <Heart size={18} />
+                  {wishlist.length > 0 && (
+                    <span className="vrd-badge-count">{wishlist.length}</span>
+                  )}
                 </button>
+
                 <button
-                  className="vrd-btn-login"
-                  style={{ padding: '6px 14px', fontSize: '0.75rem', gap: '6px' }}
-                  title="View My Table Reservations"
-                  onClick={handleOpenReservationsModal}
+                  className="vrd-icon-btn"
+                  title="Shopping Cart Tray"
+                  onClick={() => setIsCartOpen(true)}
                 >
-                  <Calendar size={14} />
-                  <span>My Bookings</span>
+                  <ShoppingBag size={18} />
+                  {cartItemCount > 0 && (
+                    <span className="vrd-badge-count">{cartItemCount}</span>
+                  )}
                 </button>
               </>
             )}
 
-
-            {/* Login / User Status */}
+            {/* Authenticated User Actions & Profile */}
             {currentUser ? (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  color: 'var(--vrd-gold)',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                }}
-                onClick={handleSignOut}
-                title="Click to Sign Out"
-              >
-                <User size={16} />
-                <span>{currentUser.name}</span>
-                <span style={{ fontSize: '0.7rem', opacity: 0.7 }}>(Sign Out)</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {/* Regular Customers Only: My Orders & My Bookings */}
+                {currentUser.role !== 'admin' && (
+                  <>
+                    <button
+                      className="vrd-btn-login"
+                      style={{ padding: '6px 14px', fontSize: '0.75rem', gap: '6px' }}
+                      title="View My Order History"
+                      onClick={handleOpenOrdersModal}
+                    >
+                      <Package size={14} />
+                      <span>My Orders</span>
+                    </button>
+                    <button
+                      className="vrd-btn-login"
+                      style={{ padding: '6px 14px', fontSize: '0.75rem', gap: '6px' }}
+                      title="View My Table Reservations"
+                      onClick={handleOpenReservationsModal}
+                    >
+                      <Calendar size={14} />
+                      <span>My Bookings</span>
+                    </button>
+                  </>
+                )}
+
+                {/* Admins Only: Direct Dashboard Button */}
+                {currentUser.role === 'admin' && (
+                  <button
+                    className="vrd-btn-login"
+                    style={{
+                      padding: '6px 14px',
+                      fontSize: '0.75rem',
+                      gap: '6px',
+                      background: 'rgba(207, 161, 105, 0.16)',
+                      borderColor: 'var(--vrd-gold)',
+                      color: 'var(--vrd-gold)',
+                      fontWeight: 700,
+                    }}
+                    title="Access Operations & Admin Analytics"
+                    onClick={onSwitchToAdmin}
+                  >
+                    <ShieldCheck size={14} />
+                    <span>Dashboard</span>
+                  </button>
+                )}
+
+                {/* Profile Button - Replaces Login/SignUp Button */}
+                <button
+                  className="vrd-btn-login"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    color: '#ffffff',
+                    borderColor: 'rgba(16, 185, 129, 0.5)',
+                    background: 'rgba(16, 185, 129, 0.15)',
+                    padding: '6px 14px',
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                  onClick={onSwitchToProfile}
+                  title="View and Edit Your Profile"
+                >
+                  <User size={14} color="var(--vrd-emerald)" />
+                  <span>Profile</span>
+                  {currentUser.role === 'admin' && (
+                    <span
+                      style={{
+                        fontSize: '0.62rem',
+                        padding: '1px 5px',
+                        borderRadius: '6px',
+                        background: 'rgba(207, 161, 105, 0.3)',
+                        color: 'var(--vrd-gold)',
+                        fontWeight: 800,
+                        textTransform: 'uppercase',
+                        marginLeft: '2px',
+                      }}
+                    >
+                      Admin
+                    </span>
+                  )}
+                </button>
+
+                {/* Sign Out Button */}
+                <button
+                  className="vrd-btn-login"
+                  style={{
+                    padding: '6px 10px',
+                    fontSize: '0.72rem',
+                    opacity: 0.75,
+                    background: 'transparent',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                  }}
+                  onClick={handleSignOut}
+                  title="Sign Out"
+                >
+                  Sign Out
+                </button>
               </div>
             ) : (
               <button
@@ -789,60 +871,136 @@ export default function VerdoraCafe({ onSwitchToCatalog }) {
             </div>
           </div>
 
-          {/* Navigation Links - 'Home' removed as requested since Logo navigates to Home */}
+          {/* Navigation Links - In Admin mode, ONLY show Dashboard & Profile */}
           <nav className="vrd-nav-links">
-            <button
-              className={activeSection === 'about' ? 'active' : ''}
-              onClick={() => scrollTo('about')}
-            >
-              Our Story
-            </button>
-            <button
-              className={activeSection === 'menu' ? 'active' : ''}
-              onClick={() => scrollTo('menu')}
-            >
-              Menu
-            </button>
-            <button
-              className={activeSection === 'booking' ? 'active' : ''}
-              onClick={() => scrollTo('booking')}
-            >
-              Reservations
-            </button>
-            <button
-              className={activeSection === 'shop' ? 'active' : ''}
-              onClick={() => scrollTo('shop')}
-            >
-              Pantry Shop
-            </button>
-            <button
-              className={activeSection === 'blog' ? 'active' : ''}
-              onClick={() => scrollTo('blog')}
-            >
-              Journal
-            </button>
-            <button
-              className={activeSection === 'contact' ? 'active' : ''}
-              onClick={() => scrollTo('contact')}
-            >
-              Visit Us
-            </button>
+            {currentUser?.role === 'admin' ? (
+              <>
+                <button
+                  className="vrd-nav-admin-btn active"
+                  style={{
+                    color: 'var(--vrd-gold)',
+                    fontWeight: 800,
+                    fontSize: '0.95rem',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    background: 'rgba(207, 161, 105, 0.16)',
+                    padding: '8px 22px',
+                    borderRadius: '24px',
+                    border: '1px solid rgba(207, 161, 105, 0.5)',
+                    cursor: 'pointer',
+                    letterSpacing: '0.03em',
+                  }}
+                  onClick={onSwitchToAdmin}
+                  title="Open Admin Dashboard"
+                >
+                  <ShieldCheck size={16} />
+                  <span>Dashboard</span>
+                </button>
+
+                <button
+                  className="vrd-nav-admin-btn"
+                  style={{
+                    color: '#ffffff',
+                    fontWeight: 700,
+                    fontSize: '0.95rem',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    background: 'rgba(16, 185, 129, 0.16)',
+                    padding: '8px 22px',
+                    borderRadius: '24px',
+                    border: '1px solid rgba(16, 185, 129, 0.45)',
+                    cursor: 'pointer',
+                    letterSpacing: '0.03em',
+                  }}
+                  onClick={onSwitchToProfile}
+                  title="Open Admin Profile"
+                >
+                  <User size={16} color="var(--vrd-emerald)" />
+                  <span>Profile</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  className={activeSection === 'about' ? 'active' : ''}
+                  onClick={() => scrollTo('about')}
+                >
+                  Our Story
+                </button>
+                <button
+                  className={activeSection === 'menu' ? 'active' : ''}
+                  onClick={() => scrollTo('menu')}
+                >
+                  Menu
+                </button>
+                <button
+                  className={activeSection === 'booking' ? 'active' : ''}
+                  onClick={() => scrollTo('booking')}
+                >
+                  Reservations
+                </button>
+                <button
+                  className={activeSection === 'shop' ? 'active' : ''}
+                  onClick={() => scrollTo('shop')}
+                >
+                  Pantry Shop
+                </button>
+                <button
+                  className={activeSection === 'blog' ? 'active' : ''}
+                  onClick={() => scrollTo('blog')}
+                >
+                  Journal
+                </button>
+                <button
+                  className={activeSection === 'contact' ? 'active' : ''}
+                  onClick={() => scrollTo('contact')}
+                >
+                  Visit Us
+                </button>
+              </>
+            )}
           </nav>
 
-          {/* Right Action: Hotline & Book Table CTA */}
+          {/* Right Action: Hotline & Book Table CTA for Customers / Console CTA for Admin */}
           <div className="vrd-nav-right">
-            <a href="tel:+94112345678" className="vrd-nav-hotline" title="Call Reservations Hotline">
-              <Phone size={13} />
-              <span>+94 11 234 5678</span>
-            </a>
+            {currentUser?.role === 'admin' ? (
+              <button
+                className="vrd-btn-book-nav"
+                style={{
+                  background: 'linear-gradient(135deg, #cfa169, #b58950)',
+                  color: '#0c120e',
+                  fontWeight: 800,
+                  fontSize: '0.85rem',
+                  border: 'none',
+                  padding: '9px 24px',
+                  borderRadius: '24px',
+                  boxShadow: '0 4px 14px rgba(207, 161, 105, 0.3)',
+                  cursor: 'pointer',
+                }}
+                onClick={onSwitchToAdmin}
+                title="Go to Admin Operations Console"
+              >
+                <ShieldCheck size={16} />
+                <span>Admin Console →</span>
+              </button>
+            ) : (
+              <>
+                <a href="tel:+94112345678" className="vrd-nav-hotline" title="Call Reservations Hotline">
+                  <Phone size={13} />
+                  <span>+94 11 234 5678</span>
+                </a>
 
-            <button
-              className="vrd-btn-book-nav"
-              onClick={() => scrollTo('booking')}
-            >
-              <Calendar size={14} />
-              <span>Book Table</span>
-            </button>
+                <button
+                  className="vrd-btn-book-nav"
+                  onClick={() => scrollTo('booking')}
+                >
+                  <Calendar size={14} />
+                  <span>Book Table</span>
+                </button>
+              </>
+            )}
           </div>
         </div>
       </header>

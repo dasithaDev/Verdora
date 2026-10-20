@@ -6,10 +6,12 @@
   "scripts": {
     "dev:server": "npm --prefix server run dev",
     "dev:client": "npm --prefix client run dev",
+    "seed": "npm --prefix server run seed",
     "start:server": "npm --prefix server start",
     "build:client": "npm --prefix client run build",
     "test": "npm --prefix server test",
     "test:reservations": "npm --prefix server run test:reservations",
+    "test:admin": "npm --prefix server run test:admin",
     "test:orders": "npm --prefix server run test:orders",
     "test:menu": "npm --prefix server run test:menu",
     "test:auth": "npm --prefix server run test:auth",
