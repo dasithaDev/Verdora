@@ -58,6 +58,15 @@ const reservationSchema = new mongoose.Schema(
     toJSON: {
       transform(doc, ret) {
         delete ret.__v;
+        // Serialize reservationDate as a plain YYYY-MM-DD string so clients
+        // receive a predictable date-only value instead of a full ISO timestamp.
+        if (ret.reservationDate instanceof Date) {
+          const d = ret.reservationDate;
+          const yyyy = d.getFullYear();
+          const mm = String(d.getMonth() + 1).padStart(2, '0');
+          const dd = String(d.getDate()).padStart(2, '0');
+          ret.reservationDate = `${yyyy}-${mm}-${dd}`;
+        }
         return ret;
       },
     },
