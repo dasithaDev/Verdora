@@ -31,11 +31,12 @@ import {
   getAdminTables,
 } from '../services/adminService';
 import { getMenuItems } from '../services/menuService';
+import Dashboard from './ui/dashboard-4';
 import './AdminDashboard.css';
 
 export default function AdminDashboard({ onBackToCafe, onSwitchToProfile, currentUser }) {
-  // Navigation Tabs: 'orders' | 'reservations' | 'menu' | 'tables'
-  const [activeTab, setActiveTab] = useState('orders');
+  // Navigation Tabs: 'analytics' | 'orders' | 'reservations' | 'menu' | 'tables'
+  const [activeTab, setActiveTab] = useState('analytics');
 
   // Dashboard Aggregated Stats
   const [stats, setStats] = useState(null);
@@ -386,6 +387,14 @@ export default function AdminDashboard({ onBackToCafe, onSwitchToProfile, curren
         {/* 3. TABS NAVIGATION */}
         <div className="vrd-admin-tabs">
           <button
+            className={`vrd-admin-tab-btn ${activeTab === 'analytics' ? 'active' : ''}`}
+            onClick={() => setActiveTab('analytics')}
+          >
+            <TrendingUp size={18} />
+            <span>Overview & Analytics</span>
+          </button>
+
+          <button
             className={`vrd-admin-tab-btn ${activeTab === 'orders' ? 'active' : ''}`}
             onClick={() => {
               setActiveTab('orders');
@@ -429,6 +438,26 @@ export default function AdminDashboard({ onBackToCafe, onSwitchToProfile, curren
             <span>Cafe Tables ({tables.length})</span>
           </button>
         </div>
+
+        {/* ====================================================================
+            TAB 0: SHADCN MODERN ANALYTICS DASHBOARD
+            ==================================================================== */}
+        {activeTab === 'analytics' && (
+          <div className="mb-8 mt-2">
+            <Dashboard
+              stats={stats}
+              onAddDish={handleOpenCreateDish}
+              onViewOrders={() => {
+                setActiveTab('orders');
+                loadOrders();
+              }}
+              onViewBookings={() => {
+                setActiveTab('reservations');
+                loadReservations();
+              }}
+            />
+          </div>
+        )}
 
         {/* ====================================================================
             TAB 1: LIVE ORDERS MANAGEMENT
