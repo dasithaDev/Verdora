@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Bar, BarChart, XAxis, YAxis } from "recharts"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { BarChart3 } from "lucide-react"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
 const chartData = [
@@ -20,12 +20,15 @@ const chartConfig = {
 
 export function CategoryRankChart() {
   return (
-    <Card className="col-span-full md:col-span-1 lg:col-span-2 border-border/60 bg-card/80 backdrop-blur-sm shadow-md">
-      <CardHeader>
-        <CardTitle className="text-base font-semibold">Category Popularity Rank</CardTitle>
-        <CardDescription>Top culinary menu categories by order volume</CardDescription>
-      </CardHeader>
-      <CardContent>
+    <div className="dashboard-card">
+      <div className="dashboard-card-header">
+        <div className="dashboard-card-title-row">
+          <BarChart3 size={18} className="dashboard-card-icon emerald" />
+          <h3 className="dashboard-card-title">Category Popularity Rank</h3>
+        </div>
+        <p className="dashboard-card-desc">Top culinary menu categories by order volume</p>
+      </div>
+      <div className="dashboard-card-content">
         <ChartContainer config={chartConfig} className="aspect-auto h-[240px] w-full">
           <BarChart data={chartData} layout="vertical" margin={{ left: 10, right: 20 }}>
             <XAxis type="number" hide />
@@ -41,7 +44,7 @@ export function CategoryRankChart() {
             <Bar dataKey="orders" radius={[0, 6, 6, 0]} />
           </BarChart>
         </ChartContainer>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }
