@@ -1,3 +1,4 @@
+import "./dashboard-4.css";
 import { CategoryRankChart } from "@/components/ui/dashboard-4-utils/category-rank-chart";
 import { QuickActions } from "@/components/ui/dashboard-4-utils/quick-actions";
 import { RefundReturnRateChart } from "@/components/ui/dashboard-4-utils/refund-return-rate-chart";
@@ -16,16 +17,18 @@ export function Dashboard({
   onViewBookings?: () => void;
 }) {
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="dashboard-4-root">
       <DashboardStats stats={stats} />
-      <RevenueChart />
-      <RefundReturnRateChart />
-      <CategoryRankChart />
-      <QuickActions
-        onAddDish={onAddDish}
-        onViewOrders={onViewOrders}
-        onViewBookings={onViewBookings}
-      />
+      <div className="dashboard-4-grid">
+        <RevenueChart />
+        <RefundReturnRateChart />
+        <CategoryRankChart />
+        <QuickActions
+          onAddDish={onAddDish}
+          onViewOrders={onViewOrders}
+          onViewBookings={onViewBookings}
+        />
+      </div>
     </div>
   );
 }
