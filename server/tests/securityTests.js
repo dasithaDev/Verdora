@@ -85,7 +85,7 @@ const runSecurityTests = async () => {
     const testTable = await CafeTable.create({
       tableNumber: Math.floor(Math.random() * 8000) + 1000,
       capacity: 4,
-      isAvailable: true,
+      isActive: true,
     });
     createdTableIds.push(testTable._id);
 
