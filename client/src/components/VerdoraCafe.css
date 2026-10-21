@@ -447,6 +447,7 @@
   background: linear-gradient(135deg, #faecd8 0%, #d4a373 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .vrd-hero-content h1 span.crema {
@@ -899,6 +900,7 @@
   padding: 100px 0;
   background: linear-gradient(135deg, #131c15 0%, #0c120e 100%);
   position: relative;
+  z-index: 30;
   border-bottom: 1px solid rgba(207, 161, 105, 0.15);
 }
 
@@ -906,7 +908,9 @@
   background: #17241a;
   border: 1px solid rgba(16, 185, 129, 0.25);
   border-radius: 20px;
-  overflow: hidden;
+  overflow: visible;
+  position: relative;
+  z-index: 35;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
@@ -914,6 +918,10 @@
 
 .vrd-booking-form-wrap {
   padding: 50px 45px;
+  position: relative;
+  z-index: 40;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
 }
 
 .vrd-form-grid {
@@ -961,10 +969,35 @@
   background: #101612;
 }
 
+.vrd-input.error,
+.vrd-select.error {
+  border-color: #f87171 !important;
+  box-shadow: 0 0 10px rgba(248, 113, 113, 0.28) !important;
+  background: rgba(30, 16, 16, 0.9) !important;
+}
+
+.vrd-field-error {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #f87171;
+  font-size: 0.76rem;
+  font-weight: 500;
+  margin-top: 3px;
+  animation: vrdErrorFade 0.2s ease-in-out;
+}
+
+@keyframes vrdErrorFade {
+  from { opacity: 0; transform: translateY(-3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .vrd-booking-visual {
   background: radial-gradient(circle at center, rgba(16, 185, 129, 0.15) 0%, transparent 70%),
               #101712;
   border-left: 1px solid rgba(16, 185, 129, 0.15);
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -979,9 +1012,19 @@
    ========================================================================== */
 .vrd-menu-section {
   padding: 110px 0;
-  background: #0c120e;
+  background: linear-gradient(135deg, rgba(8, 12, 9, 0.94) 0%, rgba(12, 16, 13, 0.82) 48%, rgba(8, 12, 9, 0.9) 100%),
+              url('/images/hero-bg.jpg') center/cover no-repeat fixed;
   position: relative;
   border-bottom: 1px solid rgba(207, 161, 105, 0.15);
+}
+
+.vrd-modal-brand-logo {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  margin: 0 auto 12px;
+  display: block;
+  filter: drop-shadow(0 6px 18px rgba(16, 185, 129, 0.35));
 }
 
 .vrd-category-tabs {
