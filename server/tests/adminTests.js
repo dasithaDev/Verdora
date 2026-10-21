@@ -100,7 +100,6 @@ const runAdminTests = async () => {
         },
       ],
       subtotal: 4800,
-      totalAmount: 4800,
       status: 'placed',
     });
     createdOrderIds.push(order1._id);

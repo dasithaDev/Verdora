@@ -15,6 +15,7 @@
     "test:orders": "npm --prefix server run test:orders",
     "test:menu": "npm --prefix server run test:menu",
     "test:auth": "npm --prefix server run test:auth",
+    "test:security": "npm --prefix server run test:security",
     "install:all": "npm install && npm --prefix server install && npm --prefix client install"
   },
   "keywords": [
