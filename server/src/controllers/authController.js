@@ -158,7 +158,7 @@ export const getMe = (req, res) => {
  */
 export const updateProfile = async (req, res, next) => {
   try {
-    const { name, currentPassword, newPassword } = req.body;
+    const { name, avatar, currentPassword, newPassword } = req.body;
     const user = await User.findById(req.user._id);
 
     if (!user) {
@@ -171,6 +171,10 @@ export const updateProfile = async (req, res, next) => {
         return sendError(res, 400, 'VALIDATION_ERROR', 'Name must be at least 2 characters long.', [{ field: 'name' }]);
       }
       user.name = trimmedName;
+    }
+
+    if (avatar !== undefined && typeof avatar === 'string') {
+      user.avatar = avatar.trim();
     }
 
     if (newPassword) {

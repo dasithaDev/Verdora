@@ -3,12 +3,18 @@ import { Bar, BarChart, XAxis, YAxis } from "recharts"
 import { BarChart3 } from "lucide-react"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
-const chartData = [
-  { category: "Coffee", orders: 480, fill: "hsl(158, 64%, 45%)" },
-  { category: "Bowls", orders: 320, fill: "hsl(38, 52%, 61%)" },
-  { category: "Juices", orders: 250, fill: "hsl(158, 64%, 35%)" },
-  { category: "Toast", orders: 190, fill: "hsl(38, 52%, 50%)" },
-  { category: "Pantry", orders: 140, fill: "hsl(140, 20%, 35%)" },
+interface CategoryRankPoint {
+  category: string;
+  orders: number;
+  fill?: string;
+}
+
+const defaultCategoryData: CategoryRankPoint[] = [
+  { category: "Beverages", orders: 0, fill: "hsl(158, 64%, 45%)" },
+  { category: "Bowls", orders: 0, fill: "hsl(38, 52%, 61%)" },
+  { category: "Juices", orders: 0, fill: "hsl(158, 64%, 35%)" },
+  { category: "Toast", orders: 0, fill: "hsl(38, 52%, 50%)" },
+  { category: "Snacks", orders: 0, fill: "hsl(140, 20%, 35%)" },
 ]
 
 const chartConfig = {
@@ -18,7 +24,8 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function CategoryRankChart() {
+export function CategoryRankChart({ data }: { data?: CategoryRankPoint[] }) {
+  const chartData = data && data.length > 0 ? data : defaultCategoryData;
   return (
     <div className="dashboard-card">
       <div className="dashboard-card-header">

@@ -6,7 +6,7 @@ import {
   updateMenuItem,
   deleteMenuItem,
 } from '../controllers/menuController.js';
-import { protect, requireRole } from '../middleware/authMiddleware.js';
+import { protect, requireRole, optionalProtect } from '../middleware/authMiddleware.js';
 import {
   validateObjectId,
   validatePagination,
@@ -15,8 +15,8 @@ import {
 
 const router = Router();
 
-// Public routes
-router.get('/', validatePagination, getMenuItems);
+// Public routes (optionalProtect allows admins to request includeUnavailable items)
+router.get('/', optionalProtect, validatePagination, getMenuItems);
 router.get('/:id', validateObjectId('id'), getMenuItemById);
 
 // Admin-only management routes

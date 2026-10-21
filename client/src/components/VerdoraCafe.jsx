@@ -62,173 +62,8 @@ const YoutubeIcon = ({ size = 14 }) => (
   </svg>
 );
 
-// Signature Verdora Cafe Items (incorporating real database dishes & cafe specialties)
-const VERDORA_SIGNATURE_ITEMS = [
-  {
-    id: 'vrd-1',
-    name: 'Single-Origin Highland Espresso',
-    desc: 'Ethically sourced high-canopy beans with notes of dark cacao and caramelized honey',
-    price: 650,
-    usdPrice: '2.20',
-    category: 'Coffee',
-    image: '/images/hero-coffee.jpg',
-    calories: '5 kcal',
-  },
-  {
-    id: 'vrd-2',
-    name: 'Artisan Vanilla Oat Latte',
-    desc: 'Double ristretto infused with Madagascar bourbon vanilla and silky steamed oat milk',
-    price: 980,
-    usdPrice: '3.30',
-    category: 'Coffee',
-    image: '/images/hero-coffee.jpg',
-    calories: '140 kcal',
-  },
-  {
-    id: 'vrd-3',
-    name: 'Spanish Cortado',
-    desc: 'Equal parts velvety micro-foamed milk and concentrated dark roast espresso',
-    price: 750,
-    usdPrice: '2.50',
-    category: 'Coffee',
-    image: '/images/hero-coffee.jpg',
-    calories: '45 kcal',
-  },
-  {
-    id: 'vrd-4',
-    name: 'Amazonian Açai Super-Bowl',
-    desc: 'Pure organic açai purée topped with activated granola, banana, chia seeds, and raw honeycomb',
-    price: 1850,
-    usdPrice: '6.20',
-    category: 'Bowls',
-    image: '/images/acai-bowl.jpg',
-    calories: '380 kcal',
-  },
-  {
-    id: 'vrd-5',
-    name: 'Pitaya Chia Glow Bowl',
-    desc: 'Wild pink pitaya, organic coconut flakes, crushed blueberries, and house flax granola',
-    price: 1650,
-    usdPrice: '5.50',
-    category: 'Bowls',
-    image: '/images/acai-bowl.jpg',
-    calories: '340 kcal',
-  },
-  {
-    id: 'vrd-6',
-    name: 'Green Goddess Glow Juice',
-    desc: 'Cold-pressed English cucumber, organic celery, granny smith apple, baby spinach, and ginger',
-    price: 950,
-    usdPrice: '3.20',
-    category: 'Juices',
-    image: '/images/green-juice.jpg',
-    calories: '120 kcal',
-  },
-  {
-    id: 'vrd-7',
-    name: 'Golden Turmeric Immunity Elixir',
-    desc: 'Steamed almond milk, fresh turmeric root, Sri Lankan cinnamon, cardamom, and black pepper',
-    price: 750,
-    usdPrice: '2.50',
-    category: 'Juices',
-    image: '/images/turmeric-latte.jpg',
-    calories: '90 kcal',
-  },
-  {
-    id: 'vrd-8',
-    name: 'Sourdough Avocado Tartine',
-    desc: 'Toasted wild yeast sourdough, whipped Hass avocado, pickled shallots, chili flakes, and microgreens',
-    price: 1450,
-    usdPrice: '4.80',
-    category: 'Toast',
-    image: '/images/avocado-toast.jpg',
-    calories: '310 kcal',
-  },
-  {
-    id: 'vrd-9',
-    name: 'Ceremonial Uji Matcha Latte',
-    desc: 'Stone-ground first-harvest Japanese green tea whisked with bamboo chasen and oat cream',
-    price: 1100,
-    usdPrice: '3.70',
-    category: 'Coffee',
-    image: '/images/matcha-latte.jpg',
-    calories: '110 kcal',
-  },
-  {
-    id: 'vrd-10',
-    name: 'House Nitrogen Cold Brew',
-    desc: '18-hour cold steeped single origin beans infused with food-grade nitrogen for stout-like creaminess',
-    price: 850,
-    usdPrice: '2.80',
-    category: 'Coffee',
-    image: '/images/hero-coffee.jpg',
-    calories: '10 kcal',
-  },
-  {
-    id: 'vrd-11',
-    name: 'Truffle Herb Roasted Cashews',
-    desc: 'Jumbo local cashews hand-tossed in cold-pressed white truffle oil and garden rosemary',
-    price: 850,
-    usdPrice: '2.80',
-    category: 'Snacks',
-    image: '/images/avocado-toast.jpg',
-    calories: '280 kcal',
-  },
-  {
-    id: 'vrd-12',
-    name: 'Activated Charcoal Vanilla Latte',
-    desc: 'Coconut charcoal micro-powder blended with espresso, vanilla bean, and warm coconut milk',
-    price: 920,
-    usdPrice: '3.10',
-    category: 'Coffee',
-    image: '/images/hero-coffee.jpg',
-    calories: '130 kcal',
-  },
-];
+// All dishes and pantry products are loaded dynamically from the live MongoDB database.
 
-// Verdora Pantry & Roastery Products
-const VERDORA_PRODUCTS = [
-  {
-    id: 'vp-1',
-    title: 'Verdora Highland Blend Beans',
-    category: 'Whole Bean (250g)',
-    price: 3200,
-    oldPrice: 3800,
-    tag: 'Signature Roast',
-    rating: 5.0,
-    image: '/images/hero-coffee.jpg',
-  },
-  {
-    id: 'vp-2',
-    title: 'Activated Grain & Honey Granola',
-    category: 'Artisan Pantry (400g)',
-    price: 2100,
-    oldPrice: 2500,
-    tag: 'Organic',
-    rating: 4.9,
-    image: '/images/acai-bowl.jpg',
-  },
-  {
-    id: 'vp-3',
-    title: 'Single-Origin Cold Brew Concentrate',
-    category: 'Ready to Pour (500ml)',
-    price: 1800,
-    oldPrice: 2200,
-    tag: 'Cold Steeped',
-    rating: 4.8,
-    image: '/images/green-juice.jpg',
-  },
-  {
-    id: 'vp-4',
-    title: 'Ceremonial Grade Matcha Tin',
-    category: 'Direct from Uji (50g)',
-    price: 4500,
-    oldPrice: 5200,
-    tag: 'Antioxidant',
-    rating: 5.0,
-    image: '/images/matcha-latte.jpg',
-  },
-];
 
 // Verdora Pillars
 const VERDORA_PILLARS = [
@@ -340,7 +175,7 @@ export default function VerdoraCafe({
     email: '',
     phone: '',
     date: '',
-    time: '7:30 PM',
+    time: '6:30 PM',
     guests: '2 Persons (Table for Two)',
     tableType: 'Indoor Botanical Corner',
   });
@@ -396,7 +231,7 @@ export default function VerdoraCafe({
         // Guest user
       });
 
-    getMenuItems({ limit: 50 })
+    getMenuItems({ limit: 100 })
       .then((res) => {
         if (res?.data?.items?.length) {
           setDbMenuItems(res.data.items);
@@ -413,7 +248,7 @@ export default function VerdoraCafe({
       if (existing) {
         return prev.map((i) => ((i._id || i.id) === itemId ? { ...i, qty: i.qty + 1 } : i));
       }
-      return [...prev, { ...item, id: itemId, qty: 1 }];
+      return [...prev, { ...item, _id: itemId, id: itemId, qty: 1 }];
     });
     showToast(`Added ${item.name || item.title} to your tray! ☕`);
   };
@@ -471,26 +306,10 @@ export default function VerdoraCafe({
     setIsPlacingOrder(true);
     try {
       // Map cart items to authoritative MongoDB Item IDs
-      const orderItems = cart.map((cartItem) => {
-        let matchedId = cartItem._id;
-
-        if (!matchedId && dbMenuItems.length > 0) {
-          const found = dbMenuItems.find(
-            (dbItem) => dbItem.name.toLowerCase().trim() === (cartItem.name || cartItem.title).toLowerCase().trim()
-          );
-          if (found) matchedId = found._id;
-        }
-
-        // If still no direct match, pair with first available database item
-        if (!matchedId && dbMenuItems.length > 0) {
-          matchedId = dbMenuItems[0]._id;
-        }
-
-        return {
-          menuItemId: matchedId,
-          quantity: cartItem.qty,
-        };
-      });
+      const orderItems = cart.map((cartItem) => ({
+        menuItemId: cartItem._id || cartItem.id,
+        quantity: cartItem.qty,
+      }));
 
       const res = await createOrder({ items: orderItems, notes: '' });
       setPlacedOrderConfirmed(res.data);
@@ -676,11 +495,22 @@ export default function VerdoraCafe({
     }
   };
 
-  // Filtered Menu Items
+  // Filtered Menu Items (purely live from MongoDB database)
   const filteredMenu =
     selectedCategory === 'All'
-      ? VERDORA_SIGNATURE_ITEMS
-      : VERDORA_SIGNATURE_ITEMS.filter((item) => item.category === selectedCategory);
+      ? dbMenuItems
+      : dbMenuItems.filter((item) => item.category === selectedCategory);
+
+  // Take-Home Roastery & Pantry Items from Database
+  const pantryProducts = dbMenuItems.filter(
+    (item) =>
+      item.name.includes('Beans') ||
+      item.name.includes('Granola') ||
+      item.name.includes('Concentrate') ||
+      item.name.includes('Tin') ||
+      item.name.includes('Cashews') ||
+      item.name.includes('Bites')
+  ).slice(0, 4);
 
   return (
     <div className="verdora-page">
@@ -800,7 +630,21 @@ export default function VerdoraCafe({
                   onClick={onSwitchToProfile}
                   title="View and Edit Your Profile"
                 >
-                  <User size={14} color="var(--vrd-emerald)" />
+                  {currentUser.avatar ? (
+                    <img
+                      src={currentUser.avatar}
+                      alt="avatar"
+                      style={{
+                        width: 18,
+                        height: 18,
+                        borderRadius: '50%',
+                        objectFit: 'cover',
+                        border: '1px solid var(--vrd-emerald)',
+                      }}
+                    />
+                  ) : (
+                    <User size={14} color="var(--vrd-emerald)" />
+                  )}
                   <span>Profile</span>
                   {currentUser.role === 'admin' && (
                     <span
@@ -1379,7 +1223,7 @@ export default function VerdoraCafe({
 
           {/* Category Tabs */}
           <div className="vrd-category-tabs">
-            {['All', 'Coffee', 'Bowls', 'Juices', 'Toast', 'Snacks'].map((cat) => (
+            {['All', 'Beverages', 'Bowls', 'Juices', 'Toast', 'Snacks'].map((cat) => (
               <button
                 key={cat}
                 className={`vrd-cat-tab ${selectedCategory === cat ? 'active' : ''}`}
@@ -1392,40 +1236,49 @@ export default function VerdoraCafe({
 
           {/* Dotted Menu Grid */}
           <div className="vrd-dotted-menu-grid">
-            {filteredMenu.map((item) => (
-              <div key={item.id} className="vrd-meal-item">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="vrd-menu-thumb"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                  }}
-                />
-                <div className="vrd-meal-info">
-                  <div className="vrd-meal-title">
-                    <span>{item.name}</span>
-                  </div>
-                  <div className="vrd-meal-desc">{item.desc}</div>
-                </div>
-
-                <div className="vrd-meal-dots"></div>
-
-                <div className="vrd-meal-right">
-                  <div style={{ textAlign: 'right' }}>
-                    <div className="vrd-meal-price">Rs. {item.price.toLocaleString()}</div>
-                    <div style={{ fontSize: '0.75rem', color: '#9fa6a1' }}>(${item.usdPrice})</div>
-                  </div>
-                  <button
-                    className="vrd-btn-add-mini"
-                    title="Add to tray"
-                    onClick={() => addToCart(item)}
-                  >
-                    <Plus size={16} />
-                  </button>
-                </div>
+            {filteredMenu.length === 0 ? (
+              <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '30px', color: '#8da191' }}>
+                <UtensilsCrossed size={36} style={{ margin: '0 auto 12px', opacity: 0.6 }} />
+                <p>No dishes found in category "{selectedCategory}".</p>
               </div>
-            ))}
+            ) : (
+              filteredMenu.map((item) => (
+                <div key={item._id || item.id} className="vrd-meal-item">
+                  <img
+                    src={item.imageUrl || item.image || '/images/hero-coffee.jpg'}
+                    alt={item.name}
+                    className="vrd-menu-thumb"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                  <div className="vrd-meal-info">
+                    <div className="vrd-meal-title">
+                      <span>{item.name}</span>
+                    </div>
+                    <div className="vrd-meal-desc">{item.description || item.desc}</div>
+                  </div>
+
+                  <div className="vrd-meal-dots"></div>
+
+                  <div className="vrd-meal-right">
+                    <div style={{ textAlign: 'right' }}>
+                      <div className="vrd-meal-price">Rs. {(item.price || 0).toLocaleString()}</div>
+                      <div style={{ fontSize: '0.75rem', color: '#9fa6a1' }}>
+                        (${(((item.price || 0) / 300)).toFixed(2)})
+                      </div>
+                    </div>
+                    <button
+                      className="vrd-btn-add-mini"
+                      title="Add to tray"
+                      onClick={() => addToCart(item)}
+                    >
+                      <Plus size={16} />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
 
           {/* Bottom Action: Toggle into Full Catalog */}
@@ -1457,13 +1310,14 @@ export default function VerdoraCafe({
           </div>
 
           <div className="vrd-products-grid">
-            {VERDORA_PRODUCTS.map((prod) => {
-              const isFav = wishlist.some((i) => i.id === prod.id);
+            {pantryProducts.map((prod) => {
+              const prodId = prod._id || prod.id;
+              const isFav = wishlist.some((i) => (i._id || i.id) === prodId);
               return (
-                <div key={prod.id} className="vrd-product-card">
+                <div key={prodId} className="vrd-product-card">
                   <div className="vrd-product-thumb">
-                    <img src={prod.image} alt={prod.title} />
-                    <span className="vrd-product-tag">{prod.tag}</span>
+                    <img src={prod.imageUrl || prod.image || '/images/hero-coffee.jpg'} alt={prod.name || prod.title} />
+                    <span className="vrd-product-tag">{prod.category}</span>
 
                     <button
                       className="vrd-icon-btn"
@@ -1493,13 +1347,13 @@ export default function VerdoraCafe({
                   </div>
 
                   <div className="vrd-product-info">
-                    <h4 className="vrd-product-title">{prod.title}</h4>
+                    <h4 className="vrd-product-title">{prod.name || prod.title}</h4>
                     <div style={{ fontSize: '0.8rem', color: '#666', marginBottom: '8px' }}>
-                      {prod.category}
+                      {prod.description || prod.category}
                     </div>
                     <div className="vrd-product-price">
-                      <span className="old">Rs. {prod.oldPrice.toLocaleString()}</span>
-                      <span>Rs. {prod.price.toLocaleString()}</span>
+                      <span className="old">Rs. {Math.round((prod.price || 0) * 1.15).toLocaleString()}</span>
+                      <span>Rs. {(prod.price || 0).toLocaleString()}</span>
                     </div>
                   </div>
                 </div>
@@ -1861,47 +1715,50 @@ export default function VerdoraCafe({
                   </button>
                 </div>
               ) : (
-                cart.map((item) => (
-                  <div key={item.id} className="vrd-cart-item">
-                    <div>
-                      <strong style={{ color: '#ffffff', display: 'block', fontSize: '0.95rem' }}>
-                        {item.name || item.title}
-                      </strong>
-                      <span style={{ color: 'var(--vrd-gold)', fontSize: '0.85rem' }}>
-                        Rs. {item.price.toLocaleString()} each
-                      </span>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <div className="vrd-cart-qty-ctrl">
-                        <button
-                          className="vrd-icon-btn"
-                          onClick={() => updateQty(item.id, -1)}
-                        >
-                          <Minus size={12} />
-                        </button>
-                        <span style={{ fontSize: '0.88rem', fontWeight: 700, minWidth: '18px', textAlign: 'center' }}>
-                          {item.qty}
+                cart.map((item) => {
+                  const itemId = item._id || item.id;
+                  return (
+                    <div key={itemId} className="vrd-cart-item">
+                      <div>
+                        <strong style={{ color: '#ffffff', display: 'block', fontSize: '0.95rem' }}>
+                          {item.name || item.title}
+                        </strong>
+                        <span style={{ color: 'var(--vrd-gold)', fontSize: '0.85rem' }}>
+                          Rs. {(item.price || 0).toLocaleString()} each
                         </span>
-                        <button
-                          className="vrd-icon-btn"
-                          onClick={() => updateQty(item.id, 1)}
-                        >
-                          <Plus size={12} />
-                        </button>
                       </div>
 
-                      <button
-                        className="vrd-icon-btn"
-                        style={{ color: '#ef4444' }}
-                        title="Remove"
-                        onClick={() => updateQty(item.id, -item.qty)}
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div className="vrd-cart-qty-ctrl">
+                          <button
+                            className="vrd-icon-btn"
+                            onClick={() => updateQty(itemId, -1)}
+                          >
+                            <Minus size={12} />
+                          </button>
+                          <span style={{ fontSize: '0.88rem', fontWeight: 700, minWidth: '18px', textAlign: 'center' }}>
+                            {item.qty}
+                          </span>
+                          <button
+                            className="vrd-icon-btn"
+                            onClick={() => updateQty(itemId, 1)}
+                          >
+                            <Plus size={12} />
+                          </button>
+                        </div>
+
+                        <button
+                          className="vrd-icon-btn"
+                          style={{ color: '#ef4444' }}
+                          title="Remove"
+                          onClick={() => updateQty(itemId, -item.qty)}
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
 

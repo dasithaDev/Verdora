@@ -17,8 +17,8 @@ export const getMenuItems = async (req, res, next) => {
 
     const filter = {};
 
-    // Only return available items to customers by default
-    if (includeUnavailable !== 'true') {
+    // Only admins may request unavailable items; customers always see available items only
+    if (includeUnavailable !== 'true' || !req.user || req.user.role !== 'admin') {
       filter.isAvailable = true;
     }
 

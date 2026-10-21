@@ -966,3 +966,95 @@
   .vrd-field-row    { grid-template-columns: 1fr; }
   .vrd-search-wrapper { width: 100%; }
 }
+
+/* ── DISH & STAFF THUMBNAILS & PREVIEWS ─────────────────────────────────── */
+.vrd-dish-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  border: 1px solid var(--c-border-gold);
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.vrd-user-thumb {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(16, 185, 129, 0.40);
+  flex-shrink: 0;
+}
+
+.vrd-user-avatar-initials {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: var(--c-emerald-hi);
+  font-weight: 700;
+  font-size: var(--fs-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.vrd-user-avatar-initials.admin {
+  background: rgba(207, 161, 105, 0.18);
+  border-color: rgba(207, 161, 105, 0.45);
+  color: var(--c-gold);
+}
+
+.vrd-dish-modal-preview {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  border: 1px solid var(--c-emerald);
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.vrd-preset-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.vrd-preset-label {
+  font-size: var(--fs-xs);
+  color: var(--c-text-muted);
+  font-weight: 600;
+  margin-right: 2px;
+}
+
+.vrd-preset-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--c-border);
+  color: var(--c-text-sub);
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.vrd-preset-btn:hover {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.40);
+  color: var(--c-emerald-hi);
+}
+
+.vrd-preset-btn.active {
+  background: var(--c-emerald-dim);
+  border-color: var(--c-emerald);
+  color: var(--c-white);
+  font-weight: 700;
+}
+
