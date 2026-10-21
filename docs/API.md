@@ -205,7 +205,7 @@ Tokens are signed using HMAC SHA-256 (`JWT_SECRET`) and default to a 7-day expir
 
 ### 3.4 Order Routes (`/api/v1/orders`)
 
-> **Status:** Planned — implemented in **Phase 6**. Routes are not yet wired in `server/src/routes/api.js`.
+* **Status:** Implemented & Verified (Phase 6)
 
 #### `POST /api/v1/orders`
 * **Access:** Customer
@@ -244,21 +244,24 @@ Tokens are signed using HMAC SHA-256 (`JWT_SECRET`) and default to a 7-day expir
 #### `GET /api/v1/orders/my`
 * **Access:** Customer (Returns only orders matching `req.user._id`)
 
+#### `GET /api/v1/orders/:id`
+* **Access:** Customer (Own orders) / Admin (Any order)
+
 #### `PATCH /api/v1/orders/:id/cancel`
-* **Access:** Customer (Permitted only if `order.status === 'placed'`)
+* **Access:** Customer (Permitted only while `order.status === 'placed'`)
 
 #### `GET /api/v1/admin/orders`
-* **Access:** Admin only (Lists all orders with status and date filters)
+* **Access:** Admin only (Lists all orders with status filter and pagination envelope)
 
 #### `PATCH /api/v1/admin/orders/:id/status`
 * **Access:** Admin only
-* **Body:** `{ "status": "preparing" }`
+* **Body:** `{ "status": "preparing" }` (Allowed: `placed` ➔ `preparing` ➔ `ready` ➔ `completed` / `cancelled`)
 
 ---
 
 ### 3.5 Reservation Routes (`/api/v1/reservations`)
 
-> **Status:** Planned — implemented in **Phase 7**. Routes are not yet wired in `server/src/routes/api.js`.
+* **Status:** Implemented & Verified (Phase 7)
 
 #### `POST /api/v1/reservations`
 * **Access:** Customer
@@ -279,7 +282,7 @@ Tokens are signed using HMAC SHA-256 (`JWT_SECRET`) and default to a 7-day expir
     "reservation": {
       "_id": "67b43caf1a2b3c4d5e6f9003",
       "tableId": "67b439cf1a2b3c4d5e6f5001",
-      "reservationDate": "2026-10-25T00:00:00.000Z",
+      "reservationDate": "2026-10-25",
       "startTime": "12:00",
       "endTime": "13:30",
       "guestCount": 4,
@@ -293,8 +296,56 @@ Tokens are signed using HMAC SHA-256 (`JWT_SECRET`) and default to a 7-day expir
 #### `GET /api/v1/reservations/my`
 * **Access:** Customer (Returns own upcoming and historical reservations)
 
+#### `GET /api/v1/reservations/:id`
+* **Access:** Customer (Own reservation) / Admin (Any reservation)
+
+#### `PATCH /api/v1/reservations/:id`
+* **Access:** Customer (Edit party size or special requests before dining time)
+
 #### `PATCH /api/v1/reservations/:id/cancel`
 * **Access:** Customer (Allowed up to 1 hour before `startTime`)
 
 #### `GET /api/v1/admin/reservations`
-* **Access:** Admin only (Lists daily schedule with table numbers and guest counts)
+* **Access:** Admin only (Lists daily schedule with status filter and guest counts)
+
+#### `PATCH /api/v1/admin/reservations/:id/status`
+* **Access:** Admin only
+* **Body:** `{ "status": "completed" }` (Transitions party to seated/completed)
+
+---
+
+### 3.6 Table Routes (`/api/v1/tables`)
+
+* **Status:** Implemented & Verified (Phase 7 & 8)
+
+#### `GET /api/v1/tables`
+* **Access:** Public / Admin
+* **Description:** Lists all cafe dining tables with numbers and capacities.
+
+#### `GET /api/v1/tables/availability`
+* **Access:** Public / Customer
+* **Query:** `?date=YYYY-MM-DD&startTime=HH:mm&guestCount=N`
+* **Description:** Checks whether matching tables are available for the requested dining interval.
+
+---
+
+### 3.7 Admin Analytics & Dashboard Routes (`/api/v1/admin`)
+
+* **Status:** Implemented & Verified (Phase 8)
+
+#### `GET /api/v1/admin/stats`
+* **Access:** Admin only
+* **Description:** Aggregates live operational metrics across orders, reservations, menu inventory, and users.
+* **Response `200 OK`:**
+```json
+{
+  "success": true,
+  "data": {
+    "summary": { "totalRevenue": 128450 },
+    "orders": { "total": 42, "activeKitchenQueue": 6 },
+    "reservations": { "total": 18, "today": 8 },
+    "menu": { "total": 24, "activeAvailable": 24 },
+    "users": { "total": 12, "customers": 11, "admins": 1 }
+  }
+}
+```
