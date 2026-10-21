@@ -3,6 +3,7 @@ import VerdoraCafe from './components/VerdoraCafe';
 import MenuPage from './components/MenuPage';
 import AdminDashboard from './components/AdminDashboard';
 import ProfilePage from './components/ProfilePage';
+import { AdminGuard, MemberGuard } from './components/RouteGuard';
 import { getMe as apiGetMe } from './services/authService';
 import './components/MenuPage.css';
 
@@ -23,6 +24,7 @@ export default function App() {
 
   const [currentView, setCurrentView] = useState(getInitialView);
   const [currentUser, setCurrentUser] = useState(null);
+  const [isAuthResolving, setIsAuthResolving] = useState(true);
 
   // Sync current user on mount
   useEffect(() => {
@@ -35,6 +37,9 @@ export default function App() {
       })
       .catch(() => {
         setCurrentUser(null);
+      })
+      .finally(() => {
+        setIsAuthResolving(false);
       });
 
     const handleHash = () => {
@@ -67,24 +72,47 @@ export default function App() {
       )}
 
       {currentView === VIEW_MODES.ADMIN_DASHBOARD && (
-        <AdminDashboard
+        <AdminGuard
+          currentUser={currentUser}
+          isAuthResolving={isAuthResolving}
+          onAuthSuccess={(user) => {
+            setCurrentUser(user);
+          }}
           onBackToCafe={() => navigateTo(VIEW_MODES.CAFE_HOME, '')}
           onSwitchToProfile={() => navigateTo(VIEW_MODES.PROFILE, 'profile')}
-          currentUser={currentUser}
-        />
-      )}
-
-      {currentView === VIEW_MODES.PROFILE && (
-        <ProfilePage
-          currentUser={currentUser}
-          onBackToCafe={() => navigateTo(VIEW_MODES.CAFE_HOME, '')}
-          onSwitchToAdmin={() => navigateTo(VIEW_MODES.ADMIN_DASHBOARD, 'admin')}
-          onUserUpdate={(updated) => setCurrentUser(updated)}
           onSignOut={() => {
             setCurrentUser(null);
             navigateTo(VIEW_MODES.CAFE_HOME, '');
           }}
-        />
+        >
+          <AdminDashboard
+            onBackToCafe={() => navigateTo(VIEW_MODES.CAFE_HOME, '')}
+            onSwitchToProfile={() => navigateTo(VIEW_MODES.PROFILE, 'profile')}
+            currentUser={currentUser}
+          />
+        </AdminGuard>
+      )}
+
+      {currentView === VIEW_MODES.PROFILE && (
+        <MemberGuard
+          currentUser={currentUser}
+          isAuthResolving={isAuthResolving}
+          onAuthSuccess={(user) => {
+            setCurrentUser(user);
+          }}
+          onBackToCafe={() => navigateTo(VIEW_MODES.CAFE_HOME, '')}
+        >
+          <ProfilePage
+            currentUser={currentUser}
+            onBackToCafe={() => navigateTo(VIEW_MODES.CAFE_HOME, '')}
+            onSwitchToAdmin={() => navigateTo(VIEW_MODES.ADMIN_DASHBOARD, 'admin')}
+            onUserUpdate={(updated) => setCurrentUser(updated)}
+            onSignOut={() => {
+              setCurrentUser(null);
+              navigateTo(VIEW_MODES.CAFE_HOME, '');
+            }}
+          />
+        </MemberGuard>
       )}
 
       {currentView === VIEW_MODES.DATABASE_CATALOG && (

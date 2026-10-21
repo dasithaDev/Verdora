@@ -2251,7 +2251,19 @@ export default function VerdoraCafe({
             </button>
 
             <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-              <div style={{ fontSize: '2.5rem', marginBottom: '6px' }}>🌿</div>
+              <img
+                src="/images/logo.png"
+                alt="Verdora Logo"
+                className="vrd-auth-modal-logo"
+                style={{
+                  width: '68px',
+                  height: '68px',
+                  objectFit: 'contain',
+                  margin: '0 auto 12px',
+                  display: 'block',
+                  filter: 'drop-shadow(0 6px 16px rgba(16, 185, 129, 0.35))',
+                }}
+              />
               <h3 style={{ fontSize: '1.5rem', color: '#ffffff' }}>
                 {authMode === 'login' ? 'Sign In to Verdora' : 'Join the Verdora Circle'}
               </h3>

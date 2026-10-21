@@ -280,8 +280,8 @@ export const createAdminUser = async (req, res, next) => {
     if (!email || typeof email !== 'string' || !/^\S+@\S+\.\S+$/.test(email)) {
       return sendError(res, 400, 'VALIDATION_ERROR', 'A valid email address is required.', [{ field: 'email' }]);
     }
-    if (!password || typeof password !== 'string' || password.length < 6) {
-      return sendError(res, 400, 'VALIDATION_ERROR', 'Password must be at least 6 characters long.', [{ field: 'password' }]);
+    if (!password || typeof password !== 'string' || password.length < 8) {
+      return sendError(res, 400, 'VALIDATION_ERROR', 'Password must be at least 8 characters long.', [{ field: 'password' }]);
     }
     const validRoles = ['staff', 'admin', 'customer'];
     const assignedRole = validRoles.includes(role) ? role : 'staff';

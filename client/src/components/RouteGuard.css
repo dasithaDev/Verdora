@@ -1,0 +1,366 @@
+/* ==========================================================================
+   VERDORA CAFE - ROUTE GUARD STYLES
+   Dark Botanical Palette: #090e0b, #0c120e, #10b981 (Emerald), #cfa169 (Gold)
+   ========================================================================== */
+
+.vrd-guard-root {
+  min-height: 100vh;
+  background: #090e0b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: #e5ece6;
+  position: relative;
+  overflow: hidden;
+}
+
+.vrd-guard-root::before {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.vrd-guard-card {
+  width: 100%;
+  max-width: 480px;
+  background: linear-gradient(150deg, rgba(20, 32, 24, 0.88), rgba(12, 18, 14, 0.98));
+  border: 1px solid rgba(207, 161, 105, 0.25);
+  border-radius: 20px;
+  padding: 36px 32px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), 0 0 30px rgba(16, 185, 129, 0.06);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  animation: vrdGuardFade 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes vrdGuardFade {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.vrd-guard-loading-card {
+  max-width: 380px;
+  padding: 48px 32px;
+}
+
+.vrd-guard-brand-logo {
+  width: 68px;
+  height: 68px;
+  object-fit: contain;
+  margin: 0 auto 14px;
+  display: block;
+  filter: drop-shadow(0 6px 16px rgba(16, 185, 129, 0.35));
+  transition: transform 0.3s ease;
+}
+
+.vrd-guard-brand-logo:hover {
+  transform: scale(1.05);
+}
+
+.vrd-guard-icon-spin {
+  color: #10b981;
+  margin: 0 auto;
+}
+
+.vrd-guard-icon-wrap {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px;
+}
+
+.vrd-guard-icon-wrap.admin {
+  background: rgba(207, 161, 105, 0.15);
+  border: 2px solid rgba(207, 161, 105, 0.4);
+  color: #cfa169;
+  box-shadow: 0 0 24px rgba(207, 161, 105, 0.25);
+}
+
+.vrd-guard-icon-wrap.member {
+  background: rgba(16, 185, 129, 0.15);
+  border: 2px solid rgba(16, 185, 129, 0.4);
+  color: #10b981;
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.25);
+}
+
+.vrd-guard-icon-wrap.forbidden {
+  background: rgba(239, 68, 68, 0.15);
+  border: 2px solid rgba(239, 68, 68, 0.45);
+  color: #ef4444;
+  box-shadow: 0 0 24px rgba(239, 68, 68, 0.25);
+}
+
+.vrd-guard-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.vrd-guard-badge.admin {
+  background: rgba(207, 161, 105, 0.16);
+  border: 1px solid rgba(207, 161, 105, 0.4);
+  color: #cfa169;
+}
+
+.vrd-guard-badge.member {
+  background: rgba(16, 185, 129, 0.16);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34d399;
+}
+
+.vrd-guard-badge.forbidden {
+  background: rgba(239, 68, 68, 0.16);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+
+.vrd-guard-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 8px;
+  letter-spacing: -0.01em;
+}
+
+.vrd-guard-desc {
+  color: #9fa6a1;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  margin: 0 0 22px;
+}
+
+.vrd-role-chip {
+  display: inline-block;
+  background: rgba(16, 185, 129, 0.18);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #10b981;
+  padding: 1px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+.vrd-guard-notice {
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 3px solid #ef4444;
+  padding: 12px 14px;
+  border-radius: 4px;
+  color: #cbd5e1;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  text-align: left;
+  margin-bottom: 24px;
+}
+
+.vrd-guard-alert {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.vrd-guard-alert.error {
+  background: rgba(239, 68, 68, 0.14);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+}
+
+.vrd-guard-form {
+  text-align: left;
+}
+
+.vrd-guard-field {
+  margin-bottom: 16px;
+}
+
+.vrd-guard-field label {
+  display: block;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #cfa169;
+  margin-bottom: 6px;
+}
+
+.vrd-guard-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.vrd-guard-field-icon {
+  position: absolute;
+  left: 14px;
+  color: #7d8781;
+  pointer-events: none;
+}
+
+.vrd-guard-input-wrap input {
+  width: 100%;
+  background: #111a14;
+  border: 1px solid rgba(207, 161, 105, 0.25);
+  border-radius: 10px;
+  padding: 12px 14px 12px 40px;
+  color: #e5ece6;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.vrd-guard-input-wrap input:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18);
+  background: #141f17;
+}
+
+.vrd-guard-form-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.vrd-guard-btn-primary {
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #cfa169, #b58950);
+  border: none;
+  color: #0c120e;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(207, 161, 105, 0.25);
+  transition: all 0.2s ease;
+}
+
+.vrd-guard-btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(207, 161, 105, 0.4);
+}
+
+.vrd-guard-btn-primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.vrd-guard-btn-primary.member {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #0c120e;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25);
+}
+
+.vrd-guard-btn-primary.member:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.vrd-guard-btn-secondary {
+  width: 100%;
+  padding: 10px 18px;
+  border-radius: 10px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34d399;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.vrd-guard-btn-secondary:hover {
+  background: rgba(16, 185, 129, 0.25);
+  color: #ffffff;
+}
+
+.vrd-guard-btn-ghost {
+  width: 100%;
+  padding: 10px 18px;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #9fa6a1;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.vrd-guard-btn-ghost:hover {
+  border-color: rgba(207, 161, 105, 0.35);
+  color: #e5ece6;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.vrd-guard-toggle-mode-btn {
+  background: none;
+  border: none;
+  color: #cfa169;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 4px;
+  transition: color 0.2s;
+  text-align: center;
+}
+
+.vrd-guard-toggle-mode-btn:hover {
+  color: #e5cfb8;
+}
+
+.vrd-guard-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
