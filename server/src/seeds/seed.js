@@ -11,13 +11,13 @@ const sampleUsers = [
   {
     name: 'Verdora Administrator',
     email: 'admin@verdora.local',
-    plainPassword: 'AdminSecurePass123!',
+    plainPassword: 'Admin123!',
     role: 'admin',
   },
   {
     name: 'Nuwan Perera',
     email: 'customer@verdora.local',
-    plainPassword: 'CustomerPass123!',
+    plainPassword: 'Customer123!',
     role: 'customer',
   },
   {
