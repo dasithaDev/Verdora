@@ -1,0 +1,356 @@
+/* ==========================================================================
+   VERDORA CUSTOM DATEPICKER — Luxury Botanical Dark Theme
+   Tokens: Emerald (#10b981), Gold (#cfa169), Deep Foliage (#0d150f)
+   ========================================================================== */
+
+.vrd-datepicker-root {
+  position: relative;
+  width: 100%;
+  z-index: 50;
+}
+
+/* ── Trigger Button ──────────────────────────────────────────────────────── */
+.vrd-datepicker-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(12, 18, 14, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 12px 16px;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-align: left;
+}
+
+.vrd-datepicker-trigger:hover {
+  border-color: rgba(207, 161, 105, 0.4);
+  background: rgba(16, 24, 18, 0.95);
+}
+
+.vrd-datepicker-trigger.active {
+  outline: none;
+  border-color: var(--vrd-emerald, #10b981);
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.35);
+  background: #101612;
+}
+
+.vrd-datepicker-trigger.error {
+  border-color: #f87171 !important;
+  box-shadow: 0 0 12px rgba(248, 113, 113, 0.3) !important;
+  background: rgba(30, 16, 16, 0.9) !important;
+}
+
+.vrd-datepicker-trigger.has-value .vrd-datepicker-display-text {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.vrd-datepicker-trigger-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vrd-datepicker-calendar-icon {
+  color: var(--vrd-emerald, #10b981);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.vrd-datepicker-trigger:hover .vrd-datepicker-calendar-icon {
+  transform: scale(1.1);
+}
+
+.vrd-datepicker-display-text {
+  color: #94a397;
+  font-size: 0.95rem;
+  user-select: none;
+}
+
+.vrd-datepicker-arrow-icon {
+  color: #7a8f81;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.vrd-datepicker-arrow-icon.rotated {
+  transform: rotate(180deg);
+  color: var(--vrd-emerald, #10b981);
+}
+
+/* ── Dropdown Container ──────────────────────────────────────────────────── */
+.vrd-datepicker-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 99999;
+  width: 320px;
+  background: rgba(13, 20, 15, 0.99);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(207, 161, 105, 0.35);
+  border-radius: 16px;
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.92),
+    0 0 0 1px rgba(16, 185, 129, 0.2),
+    0 12px 35px rgba(16, 185, 129, 0.25);
+  padding: 16px;
+  animation: vrdCalendarDrop 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  user-select: none;
+}
+
+.vrd-datepicker-dropdown.open-upwards {
+  top: auto;
+  bottom: calc(100% + 8px);
+  animation: vrdCalendarDropUp 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes vrdCalendarDrop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes vrdCalendarDropUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ── Calendar Header ─────────────────────────────────────────────────────── */
+.vrd-datepicker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.vrd-datepicker-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.vrd-datepicker-month {
+  background: linear-gradient(135deg, #ffffff 40%, var(--vrd-gold, #cfa169) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.vrd-datepicker-year {
+  color: var(--vrd-gold, #cfa169);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.vrd-datepicker-nav-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vrd-datepicker-nav-btn:hover:not(:disabled) {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: var(--vrd-emerald, #10b981);
+  color: var(--vrd-emerald, #10b981);
+  transform: scale(1.08);
+}
+
+.vrd-datepicker-nav-btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+  border-color: transparent;
+}
+
+/* ── Weekday Labels Row ──────────────────────────────────────────────────── */
+.vrd-datepicker-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.vrd-datepicker-weekday {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #728577;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 0;
+}
+
+/* ── Days Grid ───────────────────────────────────────────────────────────── */
+.vrd-datepicker-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.vrd-datepicker-day {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.88rem;
+  font-weight: 500;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #f1f5f9;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0;
+}
+
+.vrd-datepicker-day:hover:not(.disabled):not(.selected) {
+  background: rgba(16, 185, 129, 0.16);
+  border-color: rgba(16, 185, 129, 0.45);
+  color: #ffffff;
+  transform: scale(1.06);
+}
+
+/* Today's indicator */
+.vrd-datepicker-day.today:not(.selected) {
+  border-color: rgba(207, 161, 105, 0.6);
+  color: var(--vrd-gold, #cfa169);
+  font-weight: 700;
+}
+
+.vrd-datepicker-today-dot {
+  position: absolute;
+  bottom: 3px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--vrd-gold, #cfa169);
+}
+
+/* Selected Date */
+.vrd-datepicker-day.selected {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-color: #34d399;
+  color: #ffffff !important;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.5);
+  transform: scale(1.05);
+}
+
+.vrd-datepicker-selected-dot {
+  position: absolute;
+  bottom: 3px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+/* Disabled past dates */
+.vrd-datepicker-day.disabled {
+  color: #435248;
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Outside month buffer days */
+.vrd-datepicker-day.outside-month:not(.disabled) {
+  color: #55685a;
+  opacity: 0.45;
+}
+
+/* ── Quick Presets Footer ─────────────────────────────────────────────────── */
+.vrd-datepicker-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.vrd-datepicker-presets {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vrd-datepicker-preset-chip {
+  background: rgba(207, 161, 105, 0.08);
+  border: 1px solid rgba(207, 161, 105, 0.28);
+  color: var(--vrd-gold, #cfa169);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vrd-datepicker-preset-chip:hover {
+  background: var(--vrd-emerald, #10b981);
+  color: #ffffff;
+  border-color: var(--vrd-emerald, #10b981);
+  transform: translateY(-1px);
+}
+
+.vrd-datepicker-preset-chip.active {
+  background: var(--vrd-emerald, #10b981);
+  color: #ffffff;
+  border-color: var(--vrd-emerald, #10b981);
+}
+
+.vrd-datepicker-clear-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  color: #94a397;
+  font-size: 0.76rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.vrd-datepicker-clear-btn:hover {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.1);
+}

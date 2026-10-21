@@ -5,8 +5,8 @@ import { config } from '../config/env.js';
 
 dotenv.config();
 
-// ⚠️  DEVELOPMENT / DEMO USE ONLY — Throwaway credentials for local testing.
-//    Never use these values in a staging or production environment.
+// NOTE: DEVELOPMENT / DEMO USE ONLY — Throwaway credentials for local testing.
+//       Never use these values in a staging or production environment.
 const sampleUsers = [
   {
     name: 'Verdora Administrator',

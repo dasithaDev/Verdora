@@ -20,6 +20,8 @@ import {
   Upload,
   Trash2,
   X,
+  Check,
+  Plus,
 } from 'lucide-react';
 import { updateProfile, logout as apiLogout } from '../services/authService';
 import './ProfilePage.css';
@@ -104,7 +106,7 @@ export default function ProfilePage({
         if (onUserUpdate) onUserUpdate(res.data.user);
         setAvatarMessage({
           type: 'success',
-          text: trimmed ? 'Profile picture updated successfully! 🌿' : 'Profile avatar cleared.',
+          text: trimmed ? 'Profile picture updated successfully.' : 'Profile avatar cleared.',
         });
         setIsEditingAvatar(false);
       }
@@ -183,7 +185,7 @@ export default function ProfilePage({
       const res = await updateProfile({ name: name.trim() });
       if (res?.data?.user) {
         if (onUserUpdate) onUserUpdate(res.data.user);
-        setProfileMessage({ type: 'success', text: 'Profile name updated successfully! 🌿' });
+        setProfileMessage({ type: 'success', text: 'Profile name updated successfully.' });
       }
     } catch (err) {
       const msg = err?.response?.data?.error?.message || err.message || 'Failed to update profile.';
@@ -214,7 +216,7 @@ export default function ProfilePage({
     try {
       setIsUpdatingPassword(true);
       await updateProfile({ currentPassword, newPassword });
-      setPasswordMessage({ type: 'success', text: 'Password successfully changed! 🔒' });
+      setPasswordMessage({ type: 'success', text: 'Password successfully changed.' });
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
@@ -589,10 +591,10 @@ export default function ProfilePage({
                         key={tag}
                         className={`vrd-diet-tag ${isSelected ? 'active' : ''}`}
                         onClick={() => toggleTag(tag)}
-                        title="Click to toggle preference"
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                       >
-                        {isSelected ? '✓ ' : '+ '}
-                        {tag}
+                        {isSelected ? <Check size={12} /> : <Plus size={12} />}
+                        <span>{tag}</span>
                       </span>
                     );
                   })}
@@ -820,11 +822,15 @@ export default function ProfilePage({
             <div className="vrd-security-meta">
               <div className="vrd-security-meta-item">
                 <span>Session Protection</span>
-                <span className="active">✓ HttpOnly Cookie Active</span>
+                <span className="active" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                  <CheckCircle2 size={13} /> HttpOnly Cookie Active
+                </span>
               </div>
               <div className="vrd-security-meta-item">
                 <span>Access Verification</span>
-                <span className="active">✓ JWT Signed SHA-256</span>
+                <span className="active" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                  <CheckCircle2 size={13} /> JWT Signed SHA-256
+                </span>
               </div>
             </div>
           </div>

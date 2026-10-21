@@ -116,7 +116,10 @@ export default function App() {
       )}
 
       {currentView === VIEW_MODES.DATABASE_CATALOG && (
-        <div style={{ minHeight: '100vh', background: '#0c120e' }}>
+        <div style={{
+          minHeight: '100vh',
+          background: 'linear-gradient(135deg, rgba(8, 12, 9, 0.94) 0%, rgba(12, 16, 13, 0.82) 48%, rgba(8, 12, 9, 0.9) 100%), url("/images/hero-bg.jpg") center/cover no-repeat fixed',
+        }}>
           {/* Back Bar — styled to match VerdoraCafe navbar */}
           <div style={{
             background: 'rgba(10, 15, 11, 0.94)',

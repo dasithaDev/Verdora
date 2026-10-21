@@ -161,7 +161,7 @@ export default function AdminDashboard({ onBackToCafe, onSwitchToProfile, curren
       loadOrders(orderStatusFilter);
       loadStats();
     } catch (err) {
-      showToast(`❌ ${err?.response?.data?.error?.message || err.message || 'Status transition failed'}`);
+      showToast(err?.response?.data?.error?.message || err.message || 'Status transition failed');
     }
   };
 
@@ -172,7 +172,7 @@ export default function AdminDashboard({ onBackToCafe, onSwitchToProfile, curren
       loadReservations(reservationStatusFilter);
       loadStats();
     } catch (err) {
-      showToast(`❌ ${err?.response?.data?.error?.message || err.message || 'Status update failed'}`);
+      showToast(err?.response?.data?.error?.message || err.message || 'Status update failed');
     }
   };
 
@@ -215,16 +215,16 @@ export default function AdminDashboard({ onBackToCafe, onSwitchToProfile, curren
       };
       if (editingDish) {
         await updateMenuItem(editingDish._id, payload);
-        showToast(`Updated "${payload.name}" ✨`);
+        showToast(`Updated "${payload.name}" successfully`);
       } else {
         await createMenuItem(payload);
-        showToast(`Created "${payload.name}" 🌿`);
+        showToast(`Created "${payload.name}" successfully`);
       }
       setIsDishModalOpen(false);
       loadMenu();
       loadStats();
     } catch (err) {
-      showToast(`❌ ${err?.response?.data?.error?.message || err.message || 'Action failed'}`);
+      showToast(err?.response?.data?.error?.message || err.message || 'Action failed');
     }
   };
 
@@ -270,16 +270,16 @@ export default function AdminDashboard({ onBackToCafe, onSwitchToProfile, curren
       };
       if (editingTable) {
         await updateAdminTable(editingTable._id, payload);
-        showToast(`Table ${payload.tableNumber} updated ✨`);
+        showToast(`Table ${payload.tableNumber} updated successfully`);
       } else {
         await createAdminTable(payload);
-        showToast(`Table ${payload.tableNumber} created 🌿`);
+        showToast(`Table ${payload.tableNumber} created successfully`);
       }
       setIsTableModalOpen(false);
       loadTables();
       loadStats();
     } catch (err) {
-      showToast(`❌ ${err?.response?.data?.error?.message || err.message || 'Table action failed'}`);
+      showToast(err?.response?.data?.error?.message || err.message || 'Table action failed');
     }
   };
 
@@ -292,7 +292,7 @@ export default function AdminDashboard({ onBackToCafe, onSwitchToProfile, curren
       loadTables();
       loadStats();
     } catch (err) {
-      showToast(`❌ ${err?.response?.data?.error?.message || 'Could not delete table'}`);
+      showToast(err?.response?.data?.error?.message || 'Could not delete table');
     }
   };
 
@@ -305,13 +305,13 @@ export default function AdminDashboard({ onBackToCafe, onSwitchToProfile, curren
     }
     try {
       await createAdminUser(userForm);
-      showToast(`Team member "${userForm.name}" created! 🌿`);
+      showToast(`Team member "${userForm.name}" created successfully`);
       setIsUserModalOpen(false);
       setUserForm({ name: '', email: '', password: '', role: 'staff', avatar: '' });
       loadUsers(userRoleFilter);
       loadStats();
     } catch (err) {
-      showToast(`❌ ${err?.response?.data?.error?.message || err.message || 'Could not create member'}`);
+      showToast(err?.response?.data?.error?.message || err.message || 'Could not create member');
     }
   };
 
@@ -324,7 +324,7 @@ export default function AdminDashboard({ onBackToCafe, onSwitchToProfile, curren
       loadUsers(userRoleFilter);
       loadStats();
     } catch (err) {
-      showToast(`❌ ${err?.response?.data?.error?.message || 'Could not remove member'}`);
+      showToast(err?.response?.data?.error?.message || 'Could not remove member');
     }
   };
 

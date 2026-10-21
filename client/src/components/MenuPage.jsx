@@ -1,15 +1,36 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { getMenuItems } from '../services/menuService';
+import {
+  UtensilsCrossed,
+  Soup,
+  GlassWater,
+  Flame,
+  Cookie,
+  Coffee,
+  Search,
+  Leaf,
+  AlertCircle,
+  X,
+} from 'lucide-react';
 
 const CATEGORIES = ['All', 'Bowls', 'Juices', 'Toast', 'Snacks', 'Beverages'];
 
-const CATEGORY_ICONS = {
-  All: '🍽️',
-  Bowls: '🥣',
-  Juices: '🥤',
-  Toast: '🍞',
-  Snacks: '🥜',
-  Beverages: '☕',
+const renderCategoryIcon = (category, size = 16) => {
+  switch (category) {
+    case 'Bowls':
+      return <Soup size={size} />;
+    case 'Juices':
+      return <GlassWater size={size} />;
+    case 'Toast':
+      return <Flame size={size} />;
+    case 'Snacks':
+      return <Cookie size={size} />;
+    case 'Beverages':
+      return <Coffee size={size} />;
+    case 'All':
+    default:
+      return <UtensilsCrossed size={size} />;
+  }
 };
 
 const SORT_OPTIONS = [
@@ -86,7 +107,9 @@ export default function MenuPage() {
       {/* Menu Hero Section */}
       <section className="menu-hero animate-fade-in">
         <div className="menu-hero-badge">
-          <span className="badge badge-success">🌿 Farm-to-Table</span>
+          <span className="badge badge-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <Leaf size={14} /> Farm-to-Table
+          </span>
         </div>
         <h1 className="menu-hero-title">Our Menu</h1>
         <p className="menu-hero-subtitle">
@@ -97,7 +120,9 @@ export default function MenuPage() {
       {/* Search + Sort Controls */}
       <div className="menu-controls animate-fade-in">
         <div className="menu-search-wrapper">
-          <span className="menu-search-icon">🔍</span>
+          <span className="menu-search-icon" style={{ display: 'flex', alignItems: 'center' }}>
+            <Search size={18} />
+          </span>
           <input
             type="text"
             id="menu-search-input"
@@ -111,8 +136,9 @@ export default function MenuPage() {
               className="menu-search-clear"
               onClick={() => setSearchQuery('')}
               aria-label="Clear search"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
-              ✕
+              <X size={14} />
             </button>
           )}
         </div>
@@ -140,7 +166,9 @@ export default function MenuPage() {
             className={`menu-category-chip ${activeCategory === cat ? 'active' : ''}`}
             onClick={() => handleCategoryChange(cat)}
           >
-            <span className="chip-icon">{CATEGORY_ICONS[cat]}</span>
+            <span className="chip-icon" style={{ display: 'inline-flex', alignItems: 'center' }}>
+              {renderCategoryIcon(cat, 16)}
+            </span>
             <span>{cat}</span>
           </button>
         ))}
@@ -172,7 +200,9 @@ export default function MenuPage() {
       {/* Error State */}
       {error && !loading && (
         <div className="menu-error glass-panel">
-          <span className="menu-error-icon">⚠️</span>
+          <span className="menu-error-icon" style={{ display: 'inline-flex', alignItems: 'center' }}>
+            <AlertCircle size={32} color="#f87171" />
+          </span>
           <p>{error}</p>
           <button className="btn btn-primary" onClick={() => fetchMenu(1)}>
             Retry
@@ -183,7 +213,9 @@ export default function MenuPage() {
       {/* Empty State */}
       {!loading && !error && items.length === 0 && (
         <div className="menu-empty glass-panel">
-          <span className="menu-empty-icon">🍃</span>
+          <span className="menu-empty-icon" style={{ display: 'inline-flex', alignItems: 'center' }}>
+            <Leaf size={38} color="var(--vrd-emerald, #10b981)" />
+          </span>
           <h3>No dishes found</h3>
           <p>Try adjusting your search or filter.</p>
           <button
@@ -220,15 +252,17 @@ export default function MenuPage() {
                   />
                 ) : (
                   <div className="menu-card-image-placeholder">
-                    <span>{CATEGORY_ICONS[item.category] || '🍽️'}</span>
+                    <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {renderCategoryIcon(item.category, 36)}
+                    </span>
                   </div>
                 )}
-                <div className="menu-card-category-tag">
-                  {CATEGORY_ICONS[item.category]} {item.category}
+                <div className="menu-card-category-tag" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                  {renderCategoryIcon(item.category, 12)} <span>{item.category}</span>
                 </div>
                 {item.calories && (
-                  <div className="menu-card-calories-tag">
-                    🔥 {item.calories} cal
+                  <div className="menu-card-calories-tag" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <Flame size={12} /> {item.calories} cal
                   </div>
                 )}
               </div>

@@ -10,9 +10,12 @@ import {
   User,
   Star,
   CheckCircle,
+  CheckCircle2,
+  AlertCircle,
   Calendar,
   Users,
   ChevronRight,
+  ChevronLeft,
   X,
   Plus,
   Minus,
@@ -24,6 +27,7 @@ import {
   Leaf,
   UtensilsCrossed,
   Package,
+  PackageOpen,
   Truck,
   Check,
   RefreshCw,
@@ -36,6 +40,7 @@ import {
   cancelReservation as apiCancelReservation,
 } from '../services/reservationService';
 import { login as apiLogin, register as apiRegister, logout as apiLogout, getMe as apiGetMe } from '../services/authService';
+import VerdoraDatePicker from './VerdoraDatePicker';
 import './VerdoraCafe.css';
 
 // Lightweight Social SVG Icons
@@ -181,6 +186,69 @@ export default function VerdoraCafe({
   });
   const [bookingConfirmed, setBookingConfirmed] = useState(null);
 
+  // Form Validation States
+  const [bookingErrors, setBookingErrors] = useState({});
+  const [bookingTouched, setBookingTouched] = useState({});
+  const [authErrors, setAuthErrors] = useState({});
+  const [authTouched, setAuthTouched] = useState({});
+
+  // Real-time Field Validator for Table Reservations
+  const validateBookingField = (field, val) => {
+    switch (field) {
+      case 'firstName': {
+        const trimmed = (val || '').trim();
+        if (!trimmed) return 'Full Name is required.';
+        if (trimmed.length < 2) return 'Full Name must be at least 2 characters.';
+        if (!/^[a-zA-Z\s'.\-]+$/.test(trimmed)) return 'Name should contain letters and spaces only.';
+        return '';
+      }
+      case 'email': {
+        const trimmed = (val || '').trim();
+        if (!trimmed) return 'Email address is required.';
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+          return 'Please enter a valid email address (e.g. name@example.com).';
+        }
+        return '';
+      }
+      case 'phone': {
+        const trimmed = (val || '').trim();
+        if (!trimmed) return 'Phone number is required.';
+        const digits = trimmed.replace(/[^0-9]/g, '');
+        if (digits.length < 9 || digits.length > 15) {
+          return 'Enter a valid phone number (9-15 digits, e.g. +94 77 123 4567).';
+        }
+        return '';
+      }
+      case 'date': {
+        if (!val) return 'Please select a reservation date.';
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        const d = String(now.getDate()).padStart(2, '0');
+        const todayStr = `${y}-${m}-${d}`;
+        if (val < todayStr) return 'Reservation date cannot be in the past.';
+        return '';
+      }
+      default:
+        return '';
+    }
+  };
+
+  const validateAllBooking = () => {
+    const errs = {
+      firstName: validateBookingField('firstName', bookingForm.firstName),
+      email: validateBookingField('email', bookingForm.email),
+      phone: validateBookingField('phone', bookingForm.phone),
+      date: validateBookingField('date', bookingForm.date),
+    };
+    const active = {};
+    Object.keys(errs).forEach((k) => {
+      if (errs[k]) active[k] = errs[k];
+    });
+    setBookingErrors(active);
+    return active;
+  };
+
   // Auth Modal State
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login');
@@ -250,7 +318,7 @@ export default function VerdoraCafe({
       }
       return [...prev, { ...item, _id: itemId, id: itemId, qty: 1 }];
     });
-    showToast(`Added ${item.name || item.title} to your tray! ☕`);
+    showToast(`Added ${item.name || item.title} to your tray!`);
   };
 
   // Update Cart Qty
@@ -278,7 +346,7 @@ export default function VerdoraCafe({
         showToast('Removed from favorites');
         return prev.filter((i) => (i._id || i.id) !== itemId);
       } else {
-        showToast(`Saved ${item.title || item.name} to favorites ❤️`);
+        showToast(`Saved ${item.title || item.name} to favorites.`);
         return [...prev, item];
       }
     });
@@ -294,7 +362,7 @@ export default function VerdoraCafe({
       setIsCartOpen(false);
       setAuthMode('login');
       setIsAuthOpen(true);
-      showToast('Please sign in or register to place your order ☕');
+      showToast('Please sign in or register to place your order.');
       return;
     }
 
@@ -315,10 +383,10 @@ export default function VerdoraCafe({
       setPlacedOrderConfirmed(res.data);
       setCart([]);
       setIsCartOpen(false);
-      showToast(`🎉 Order placed successfully! Reference #${res.data._id.slice(-6).toUpperCase()}`);
+      showToast(`Order placed successfully! Reference #${res.data._id.slice(-6).toUpperCase()}`);
     } catch (err) {
       const errMsg = err?.response?.data?.error?.message || err.message || 'Failed to place order';
-      showToast(`❌ ${errMsg}`);
+      showToast(errMsg);
     } finally {
       setIsPlacingOrder(false);
     }
@@ -347,7 +415,7 @@ export default function VerdoraCafe({
       setCustomerOrders(res.data.orders || []);
     } catch (err) {
       const errMsg = err?.response?.data?.error?.message || err.message || 'Could not cancel order';
-      showToast(`❌ ${errMsg}`);
+      showToast(errMsg);
     }
   };
 
@@ -357,12 +425,16 @@ export default function VerdoraCafe({
     if (!currentUser) {
       setAuthMode('login');
       setIsAuthOpen(true);
-      showToast('Please sign in or register to reserve a table 🪴');
+      showToast('Please sign in or register to reserve a table.');
       return;
     }
 
-    if (!bookingForm.date) {
-      showToast('Please select a reservation date');
+    // Validate all fields
+    setBookingTouched({ firstName: true, email: true, phone: true, date: true });
+    const errors = validateAllBooking();
+    if (Object.keys(errors).length > 0) {
+      const firstError = Object.values(errors)[0];
+      showToast(firstError);
       return;
     }
 
@@ -393,7 +465,7 @@ export default function VerdoraCafe({
       const confirmedData = res.data;
       setBookingConfirmed({
         ticketId: 'VRD-' + confirmedData._id.slice(-6).toUpperCase(),
-        firstName: bookingForm.firstName || currentUser.name,
+        firstName: bookingForm.firstName || currentUser?.name || 'Valued Guest',
         date: bookingForm.date,
         time: bookingForm.time,
         guests: bookingForm.guests,
@@ -402,10 +474,12 @@ export default function VerdoraCafe({
           : bookingForm.tableType,
         ...confirmedData,
       });
-      showToast(`🎉 Table reserved! Reference: VRD-${confirmedData._id.slice(-6).toUpperCase()} 🪴`);
+      setBookingErrors({});
+      setBookingTouched({});
+      showToast(`Table reserved! Reference: VRD-${confirmedData._id.slice(-6).toUpperCase()}`);
     } catch (err) {
       const errMsg = err?.response?.data?.error?.message || err.message || 'Could not complete reservation';
-      showToast(`❌ ${errMsg}`);
+      showToast(errMsg);
     } finally {
       setIsSubmittingBooking(false);
     }
@@ -434,37 +508,62 @@ export default function VerdoraCafe({
       setCustomerReservations(res.data.reservations || []);
     } catch (err) {
       const errMsg = err?.response?.data?.error?.message || err.message || 'Could not cancel reservation';
-      showToast(`❌ ${errMsg}`);
+      showToast(errMsg);
     }
   };
 
   // Handle Real Auth Submission (Login or Register)
   const handleAuthSubmit = async (e) => {
     e.preventDefault();
-    if (!authForm.email || !authForm.password) {
-      showToast('Please enter your email and password');
+    setAuthTouched({ name: true, email: true, password: true });
+    const errs = {};
+
+    if (authMode === 'register') {
+      const trimmedName = (authForm.name || '').trim();
+      if (!trimmedName) errs.name = 'Full Name is required.';
+      else if (trimmedName.length < 2) errs.name = 'Full Name must be at least 2 characters.';
+    }
+
+    const trimmedEmail = (authForm.email || '').trim();
+    if (!trimmedEmail) errs.email = 'Email address is required.';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      errs.email = 'Please enter a valid email address.';
+    }
+
+    if (!authForm.password) {
+      errs.password = 'Password is required.';
+    } else if (authMode === 'register' && authForm.password.length < 8) {
+      errs.password = 'Password must be at least 8 characters long.';
+    }
+
+    if (Object.keys(errs).length > 0) {
+      setAuthErrors(errs);
+      showToast(Object.values(errs)[0]);
       return;
     }
+    setAuthErrors({});
 
     try {
       let res;
       if (authMode === 'login') {
-        res = await apiLogin({ email: authForm.email, password: authForm.password });
+        res = await apiLogin({ email: trimmedEmail, password: authForm.password });
       } else {
-        res = await apiRegister({ name: authForm.name, email: authForm.email, password: authForm.password });
+        res = await apiRegister({ name: authForm.name.trim(), email: trimmedEmail, password: authForm.password });
       }
 
       const userData = res?.data?.user || res?.data;
       const userName = userData?.name || 'Member';
-      showToast(authMode === 'login' ? `Welcome back, ${userName}! 👋` : `Account created! Welcome to Verdora, ${userName}! 🌿`);
+      showToast(authMode === 'login' ? `Welcome back, ${userName}!` : `Account created! Welcome to Verdora, ${userName}!`);
 
       setCurrentUser(userData);
       if (onAuthSuccess) onAuthSuccess(userData);
       setIsAuthOpen(false);
       setAuthForm({ name: '', email: '', password: '' });
+      setAuthErrors({});
+      setAuthTouched({});
     } catch (err) {
       const errMsg = err?.response?.data?.error?.message || err.message || 'Authentication failed';
-      showToast(`❌ ${errMsg}`);
+      showToast(errMsg);
     }
   };
 
@@ -481,8 +580,16 @@ export default function VerdoraCafe({
   // Handle Newsletter
   const handleNewsletterSubmit = (e) => {
     e.preventDefault();
-    if (!newsletterEmail) return;
-    showToast('Subscribed! Welcome to the Verdora Wellness Club. 🌿');
+    const trimmed = (newsletterEmail || '').trim();
+    if (!trimmed) {
+      showToast('Please enter your email address.');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      showToast('Please enter a valid email address (e.g. name@example.com).');
+      return;
+    }
+    showToast('Subscribed! Welcome to the Verdora Wellness Club.');
     setNewsletterEmail('');
   };
 
@@ -543,7 +650,7 @@ export default function VerdoraCafe({
                 <button
                   className="vrd-icon-btn"
                   title="Favorites"
-                  onClick={() => showToast(`You have ${wishlist.length} items in your wishlist ❤️`)}
+                  onClick={() => showToast(`You have ${wishlist.length} items in your wishlist.`)}
                 >
                   <Heart size={18} />
                   {wishlist.length > 0 && (
@@ -967,7 +1074,7 @@ export default function VerdoraCafe({
 
               <div className="vrd-about-meta">
                 <div className="vrd-signature">
-                  <span className="vrd-signature-script">Dasitha & Team</span>
+                  <span className="vrd-signature-script">Dasitha Nayanapriya</span>
                   <span className="vrd-signature-title">Founder & Executive Kitchen Lead</span>
                 </div>
 
@@ -996,6 +1103,8 @@ export default function VerdoraCafe({
             <p>
               Every element of Verdora is designed to elevate your day — from morning espresso rituals to nourishing
               brunch bowls and calming herbal infusions.
+              <br />
+              <br />
             </p>
           </div>
 
@@ -1032,62 +1141,117 @@ export default function VerdoraCafe({
                 </span>
                 <h2>Reserve Your Spot at Verdora</h2>
                 <p>Join us for breakfast, working coffee sessions, or an intimate weekend brunch.</p>
+              <br/>
               </div>
 
               <form onSubmit={handleBookingSubmit} className="vrd-form-grid">
                 <div className="vrd-form-group full-width">
-                  <label>Full Name</label>
+                  <label htmlFor="booking-name">Full Name *</label>
                   <input
+                    id="booking-name"
                     type="text"
-                    className="vrd-input"
+                    className={`vrd-input ${bookingTouched.firstName && bookingErrors.firstName ? 'error' : ''}`}
                     placeholder="e.g. Dasitha Bandara"
                     value={bookingForm.firstName}
-                    onChange={(e) =>
-                      setBookingForm({ ...bookingForm, firstName: e.target.value })
-                    }
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setBookingForm({ ...bookingForm, firstName: val });
+                      if (bookingTouched.firstName) {
+                        setBookingErrors((prev) => ({ ...prev, firstName: validateBookingField('firstName', val) }));
+                      }
+                    }}
+                    onBlur={() => {
+                      setBookingTouched((prev) => ({ ...prev, firstName: true }));
+                      setBookingErrors((prev) => ({ ...prev, firstName: validateBookingField('firstName', bookingForm.firstName) }));
+                    }}
                     required
                   />
+                  {bookingTouched.firstName && bookingErrors.firstName && (
+                    <span className="vrd-field-error">
+                      <AlertCircle size={13} /> {bookingErrors.firstName}
+                    </span>
+                  )}
                 </div>
 
                 <div className="vrd-form-group">
-                  <label>Email Address</label>
+                  <label htmlFor="booking-email">Email Address *</label>
                   <input
+                    id="booking-email"
                     type="email"
-                    className="vrd-input"
+                    className={`vrd-input ${bookingTouched.email && bookingErrors.email ? 'error' : ''}`}
                     placeholder="name@example.com"
                     value={bookingForm.email}
-                    onChange={(e) =>
-                      setBookingForm({ ...bookingForm, email: e.target.value })
-                    }
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setBookingForm({ ...bookingForm, email: val });
+                      if (bookingTouched.email) {
+                        setBookingErrors((prev) => ({ ...prev, email: validateBookingField('email', val) }));
+                      }
+                    }}
+                    onBlur={() => {
+                      setBookingTouched((prev) => ({ ...prev, email: true }));
+                      setBookingErrors((prev) => ({ ...prev, email: validateBookingField('email', bookingForm.email) }));
+                    }}
                     required
                   />
+                  {bookingTouched.email && bookingErrors.email && (
+                    <span className="vrd-field-error">
+                      <AlertCircle size={13} /> {bookingErrors.email}
+                    </span>
+                  )}
                 </div>
 
                 <div className="vrd-form-group">
-                  <label>Phone Number</label>
+                  <label htmlFor="booking-phone">Phone Number *</label>
                   <input
+                    id="booking-phone"
                     type="tel"
-                    className="vrd-input"
+                    className={`vrd-input ${bookingTouched.phone && bookingErrors.phone ? 'error' : ''}`}
                     placeholder="+94 77 123 4567"
                     value={bookingForm.phone}
-                    onChange={(e) =>
-                      setBookingForm({ ...bookingForm, phone: e.target.value })
-                    }
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setBookingForm({ ...bookingForm, phone: val });
+                      if (bookingTouched.phone) {
+                        setBookingErrors((prev) => ({ ...prev, phone: validateBookingField('phone', val) }));
+                      }
+                    }}
+                    onBlur={() => {
+                      setBookingTouched((prev) => ({ ...prev, phone: true }));
+                      setBookingErrors((prev) => ({ ...prev, phone: validateBookingField('phone', bookingForm.phone) }));
+                    }}
                     required
                   />
+                  {bookingTouched.phone && bookingErrors.phone && (
+                    <span className="vrd-field-error">
+                      <AlertCircle size={13} /> {bookingErrors.phone}
+                    </span>
+                  )}
                 </div>
 
                 <div className="vrd-form-group">
-                  <label>Reservation Date</label>
-                  <input
-                    type="date"
-                    className="vrd-input"
+                  <label htmlFor="booking-date">Reservation Date *</label>
+                  <VerdoraDatePicker
+                    id="booking-date"
                     value={bookingForm.date}
-                    onChange={(e) =>
-                      setBookingForm({ ...bookingForm, date: e.target.value })
-                    }
+                    error={bookingTouched.date && !!bookingErrors.date}
+                    onChange={(dateStr) => {
+                      setBookingForm({ ...bookingForm, date: dateStr });
+                      setBookingTouched((prev) => ({ ...prev, date: true }));
+                      setBookingErrors((prev) => ({ ...prev, date: validateBookingField('date', dateStr) }));
+                    }}
+                    onBlur={() => {
+                      setBookingTouched((prev) => ({ ...prev, date: true }));
+                      setBookingErrors((prev) => ({ ...prev, date: validateBookingField('date', bookingForm.date) }));
+                    }}
+                    placeholder="Choose reservation date..."
                     required
                   />
+                  {bookingTouched.date && bookingErrors.date && (
+                    <span className="vrd-field-error">
+                      <AlertCircle size={13} /> {bookingErrors.date}
+                    </span>
+                  )}
                 </div>
 
                 <div className="vrd-form-group">
@@ -1218,6 +1382,8 @@ export default function VerdoraCafe({
             <h2>What We Have In Here</h2>
             <p>
               Explore our handcrafted coffee extractions, cold-pressed botanical juices, warm nourish bowls, and wholesome snacks.
+            <br/>
+            <br/>
             </p>
           </div>
 
@@ -1306,6 +1472,8 @@ export default function VerdoraCafe({
             <h2>Take Verdora Home With You</h2>
             <p>
               Small-batch freshly roasted coffee beans, activated granolas, and ceremonial matcha tins delivered to your door.
+            <br/>
+            <br/>
             </p>
           </div>
 
@@ -1443,6 +1611,7 @@ export default function VerdoraCafe({
             </span>
             <h2>What Our Community Says</h2>
             <p>Read authentic feedback from regular guests, specialty roaster critics, and health food advocates.</p>
+            <br/>
           </div>
 
           <div className="vrd-testi-grid">
@@ -1480,6 +1649,7 @@ export default function VerdoraCafe({
             </span>
             <h2>Latest Stories & Brewing Guides</h2>
             <p>Explore articles written by our executive chefs, wellness consultants, and senior coffee baristas.</p>
+          <br/>
           </div>
 
           <div className="vrd-blog-grid">
@@ -1499,7 +1669,7 @@ export default function VerdoraCafe({
                   <span
                     className="vrd-feature-link"
                     style={{ cursor: 'pointer' }}
-                    onClick={() => showToast(`Reading "${post.title}" 📖`)}
+                    onClick={() => showToast(`Reading "${post.title}"`)}
                   >
                     Read Journal Entry <ArrowRight size={14} />
                   </span>
@@ -1643,7 +1813,9 @@ export default function VerdoraCafe({
                     textAlign: 'center',
                   }}
                 >
-                  📍 42 Lotus Grove Blvd, Colombo 07
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <MapPin size={15} color="var(--vrd-emerald)" /> 42 Lotus Grove Blvd, Colombo 07
+                  </span>
                   <div style={{ marginTop: '8px' }}>
                     <a
                       href="https://maps.google.com"
@@ -1698,7 +1870,9 @@ export default function VerdoraCafe({
             <div className="vrd-drawer-body">
               {cart.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--vrd-text-muted)' }}>
-                  <div style={{ fontSize: '3.5rem', marginBottom: '16px' }}>🛒</div>
+                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+                    <ShoppingBag size={56} color="var(--vrd-emerald)" style={{ opacity: 0.85 }} />
+                  </div>
                   <h4>Your order tray is empty</h4>
                   <p style={{ fontSize: '0.9rem', marginTop: '6px' }}>
                     Select artisan coffees, fresh bowls, or wellness juices from the menu.
@@ -1829,8 +2003,28 @@ export default function VerdoraCafe({
             </button>
 
             <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-              <div style={{ fontSize: '3.5rem', marginBottom: '8px' }}>🌿🎉</div>
-              <h3 style={{ fontSize: '1.6rem', color: 'var(--vrd-emerald)' }}>
+              <div style={{ position: 'relative', display: 'inline-block', margin: '0 auto 12px' }}>
+                <img src="/images/logo.png" alt="Verdora Logo" className="vrd-modal-brand-logo" style={{ margin: '0 auto' }} />
+                <div style={{
+                  position: 'absolute',
+                  bottom: '-2px',
+                  right: '-2px',
+                  background: 'rgba(16, 185, 129, 0.25)',
+                  border: '2px solid var(--vrd-emerald)',
+                  borderRadius: '50%',
+                  width: '26px',
+                  height: '26px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'var(--vrd-emerald)',
+                  boxShadow: '0 4px 12px rgba(16, 185, 129, 0.4)',
+                  backdropFilter: 'blur(4px)',
+                }}>
+                  <CheckCircle2 size={15} />
+                </div>
+              </div>
+              <h3 style={{ fontSize: '1.6rem', color: 'var(--vrd-emerald)', margin: '4px 0 6px' }}>
                 Table Reserved at Verdora!
               </h3>
               <p style={{ color: 'var(--vrd-text-muted)', fontSize: '0.9rem' }}>
@@ -1900,7 +2094,27 @@ export default function VerdoraCafe({
             </button>
 
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-              <div style={{ fontSize: '3rem', marginBottom: '8px' }}>🎉☕</div>
+              <div style={{ position: 'relative', display: 'inline-block', margin: '0 auto 10px' }}>
+                <img src="/images/logo.png" alt="Verdora Logo" className="vrd-modal-brand-logo" style={{ margin: '0 auto' }} />
+                <div style={{
+                  position: 'absolute',
+                  bottom: '-2px',
+                  right: '-2px',
+                  background: 'rgba(16, 185, 129, 0.25)',
+                  border: '2px solid var(--vrd-emerald)',
+                  borderRadius: '50%',
+                  width: '26px',
+                  height: '26px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'var(--vrd-emerald)',
+                  boxShadow: '0 4px 12px rgba(16, 185, 129, 0.4)',
+                  backdropFilter: 'blur(4px)',
+                }}>
+                  <CheckCircle2 size={15} />
+                </div>
+              </div>
               <h3 style={{ fontSize: '1.6rem', color: 'var(--vrd-emerald)', marginBottom: '4px' }}>
                 Order Received!
               </h3>
@@ -2040,7 +2254,9 @@ export default function VerdoraCafe({
               </div>
             ) : customerOrders.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--vrd-text-muted)' }}>
-                <div style={{ fontSize: '3rem', marginBottom: '12px' }}>🌿🍵</div>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}>
+                  <PackageOpen size={48} color="var(--vrd-emerald)" style={{ opacity: 0.85 }} />
+                </div>
                 <h4 style={{ color: '#ffffff', marginBottom: '8px' }}>No orders yet</h4>
                 <p style={{ fontSize: '0.9rem', marginBottom: '20px' }}>
                   Explore our nourishing organic menu and place your first table order!
@@ -2151,7 +2367,9 @@ export default function VerdoraCafe({
               </div>
             ) : customerReservations.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--vrd-text-muted)' }}>
-                <div style={{ fontSize: '3rem', marginBottom: '12px' }}>🌿🪑</div>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}>
+                  <Calendar size={48} color="var(--vrd-emerald)" style={{ opacity: 0.85 }} />
+                </div>
                 <h4 style={{ color: '#ffffff', marginBottom: '8px' }}>No reservations found</h4>
                 <p style={{ fontSize: '0.9rem', marginBottom: '20px' }}>
                   Reserve a table for your next healthy meal, coffee tasting, or casual meeting.
@@ -2277,40 +2495,73 @@ export default function VerdoraCafe({
             <form onSubmit={handleAuthSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               {authMode === 'register' && (
                 <div className="vrd-form-group">
-                  <label>Full Name</label>
+                  <label htmlFor="auth-name">Full Name *</label>
                   <input
+                    id="auth-name"
                     type="text"
-                    className="vrd-input"
+                    className={`vrd-input ${authTouched.name && authErrors.name ? 'error' : ''}`}
                     placeholder="e.g. Dasitha Bandara"
                     value={authForm.name}
-                    onChange={(e) => setAuthForm({ ...authForm, name: e.target.value })}
+                    onChange={(e) => {
+                      setAuthForm({ ...authForm, name: e.target.value });
+                      if (authTouched.name && authErrors.name) {
+                        setAuthErrors((prev) => ({ ...prev, name: '' }));
+                      }
+                    }}
                     required
                   />
+                  {authTouched.name && authErrors.name && (
+                    <span className="vrd-field-error">
+                      <AlertCircle size={13} /> {authErrors.name}
+                    </span>
+                  )}
                 </div>
               )}
 
               <div className="vrd-form-group">
-                <label>Email Address</label>
+                <label htmlFor="auth-email">Email Address *</label>
                 <input
+                  id="auth-email"
                   type="email"
-                  className="vrd-input"
+                  className={`vrd-input ${authTouched.email && authErrors.email ? 'error' : ''}`}
                   placeholder="name@example.com"
                   value={authForm.email}
-                  onChange={(e) => setAuthForm({ ...authForm, email: e.target.value })}
+                  onChange={(e) => {
+                    setAuthForm({ ...authForm, email: e.target.value });
+                    if (authTouched.email && authErrors.email) {
+                      setAuthErrors((prev) => ({ ...prev, email: '' }));
+                    }
+                  }}
                   required
                 />
+                {authTouched.email && authErrors.email && (
+                  <span className="vrd-field-error">
+                    <AlertCircle size={13} /> {authErrors.email}
+                  </span>
+                )}
               </div>
 
               <div className="vrd-form-group">
-                <label>Password</label>
+                <label htmlFor="auth-password">Password {authMode === 'register' ? '(min 8 characters) *' : '*'}</label>
                 <input
+                  id="auth-password"
                   type="password"
-                  className="vrd-input"
+                  className={`vrd-input ${authTouched.password && authErrors.password ? 'error' : ''}`}
                   placeholder="••••••••"
                   value={authForm.password}
-                  onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
+                  onChange={(e) => {
+                    setAuthForm({ ...authForm, password: e.target.value });
+                    if (authTouched.password && authErrors.password) {
+                      setAuthErrors((prev) => ({ ...prev, password: '' }));
+                    }
+                  }}
                   required
                 />
+                {authTouched.password && authErrors.password && (
+                  <span className="vrd-field-error">
+                    <AlertCircle size={13} /> {authErrors.password}
+                  </span>
+                )}
               </div>
 
               <button
