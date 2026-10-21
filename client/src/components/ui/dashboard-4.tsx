@@ -20,9 +20,9 @@ export function Dashboard({
     <div className="dashboard-4-root">
       <DashboardStats stats={stats} />
       <div className="dashboard-4-grid">
-        <RevenueChart />
-        <RefundReturnRateChart />
-        <CategoryRankChart />
+        <RevenueChart data={stats?.charts?.weeklyRevenue} />
+        <RefundReturnRateChart data={stats?.charts?.fulfillmentRate} />
+        <CategoryRankChart data={stats?.charts?.categoryRank} />
         <QuickActions
           onAddDish={onAddDish}
           onViewOrders={onViewOrders}

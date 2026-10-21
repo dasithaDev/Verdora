@@ -3,14 +3,20 @@ import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
 import { TrendingUp } from "lucide-react"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
-const chartData = [
-  { month: "Mon", revenue: 18500, orders: 42 },
-  { month: "Tue", revenue: 22400, orders: 56 },
-  { month: "Wed", revenue: 19800, orders: 48 },
-  { month: "Thu", revenue: 27900, orders: 68 },
-  { month: "Fri", revenue: 34500, orders: 84 },
-  { month: "Sat", revenue: 48200, orders: 112 },
-  { month: "Sun", revenue: 41800, orders: 98 },
+interface RevenuePoint {
+  month: string;
+  revenue: number;
+  orders: number;
+}
+
+const defaultEmptyData: RevenuePoint[] = [
+  { month: "Mon", revenue: 0, orders: 0 },
+  { month: "Tue", revenue: 0, orders: 0 },
+  { month: "Wed", revenue: 0, orders: 0 },
+  { month: "Thu", revenue: 0, orders: 0 },
+  { month: "Fri", revenue: 0, orders: 0 },
+  { month: "Sat", revenue: 0, orders: 0 },
+  { month: "Sun", revenue: 0, orders: 0 },
 ]
 
 const chartConfig = {
@@ -24,7 +30,8 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function RevenueChart() {
+export function RevenueChart({ data }: { data?: RevenuePoint[] }) {
+  const chartData = data && data.length > 0 ? data : defaultEmptyData;
   return (
     <div className="dashboard-card">
       <div className="dashboard-card-header">

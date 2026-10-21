@@ -3,14 +3,20 @@ import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 import { CheckCircle2 } from "lucide-react"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
-const chartData = [
-  { day: "Mon", fulfilled: 42, cancelled: 1 },
-  { day: "Tue", fulfilled: 54, cancelled: 2 },
-  { day: "Wed", fulfilled: 46, cancelled: 1 },
-  { day: "Thu", fulfilled: 65, cancelled: 3 },
-  { day: "Fri", fulfilled: 82, cancelled: 2 },
-  { day: "Sat", fulfilled: 108, cancelled: 4 },
-  { day: "Sun", fulfilled: 95, cancelled: 3 },
+interface FulfillmentPoint {
+  day: string;
+  fulfilled: number;
+  cancelled: number;
+}
+
+const defaultFulfillmentData: FulfillmentPoint[] = [
+  { day: "Mon", fulfilled: 0, cancelled: 0 },
+  { day: "Tue", fulfilled: 0, cancelled: 0 },
+  { day: "Wed", fulfilled: 0, cancelled: 0 },
+  { day: "Thu", fulfilled: 0, cancelled: 0 },
+  { day: "Fri", fulfilled: 0, cancelled: 0 },
+  { day: "Sat", fulfilled: 0, cancelled: 0 },
+  { day: "Sun", fulfilled: 0, cancelled: 0 },
 ]
 
 const chartConfig = {
@@ -24,15 +30,21 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function RefundReturnRateChart() {
+export function RefundReturnRateChart({ data }: { data?: FulfillmentPoint[] }) {
+  const chartData = data && data.length > 0 ? data : defaultFulfillmentData;
+  const totalFulfilled = chartData.reduce((acc, c) => acc + c.fulfilled, 0);
+  const totalCancelled = chartData.reduce((acc, c) => acc + c.cancelled, 0);
+  const totalBoth = totalFulfilled + totalCancelled;
+  const rateStr = totalBoth > 0 ? `${((totalFulfilled / totalBoth) * 100).toFixed(1)}%` : '100%';
+
   return (
     <div className="dashboard-card">
       <div className="dashboard-card-header">
         <div className="dashboard-card-title-row">
           <CheckCircle2 size={18} className="dashboard-card-icon emerald" />
-          <h3 className="dashboard-card-title">Fulfillment vs Return Rate</h3>
+          <h3 className="dashboard-card-title">Fulfillment vs Cancellation Rate</h3>
         </div>
-        <p className="dashboard-card-desc">Order delivery success rate with 97.2% completion</p>
+        <p className="dashboard-card-desc">Order delivery success rate with {rateStr} completion</p>
       </div>
       <div className="dashboard-card-content">
         <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
