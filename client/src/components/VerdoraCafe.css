@@ -733,8 +733,8 @@
 
 .vrd-about-experience-badge {
   position: absolute;
-  bottom: -20px;
-  right: 20px;
+  bottom: 5px;
+  right: 10px;
   background: var(--vrd-gold);
   color: #0c120e;
   padding: 18px 24px;

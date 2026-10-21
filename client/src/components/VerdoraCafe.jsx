@@ -1074,7 +1074,7 @@ export default function VerdoraCafe({
 
               <div className="vrd-about-meta">
                 <div className="vrd-signature">
-                  <span className="vrd-signature-script">Dasitha & Team</span>
+                  <span className="vrd-signature-script">Dasitha Nayanapriya</span>
                   <span className="vrd-signature-title">Founder & Executive Kitchen Lead</span>
                 </div>
 
