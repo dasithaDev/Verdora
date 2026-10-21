@@ -83,10 +83,72 @@ export const deleteMenuItem = async (id) => {
 };
 
 /**
- * Fetch all cafe tables.
+ * Fetch all cafe tables (including inactive) for admin floor management.
  * @returns {Promise<Object>}
  */
 export const getAdminTables = async () => {
-  const response = await apiClient.get('/tables');
+  const response = await apiClient.get('/admin/tables');
   return response.data;
 };
+
+/**
+ * Create a new cafe table.
+ * @param {Object} tableData - { tableNumber, capacity, isActive }
+ * @returns {Promise<Object>}
+ */
+export const createAdminTable = async (tableData) => {
+  const response = await apiClient.post('/admin/tables', tableData);
+  return response.data;
+};
+
+/**
+ * Update an existing cafe table.
+ * @param {string} id - Table ObjectId
+ * @param {Object} tableData - { tableNumber, capacity, isActive }
+ * @returns {Promise<Object>}
+ */
+export const updateAdminTable = async (id, tableData) => {
+  const response = await apiClient.patch(`/admin/tables/${id}`, tableData);
+  return response.data;
+};
+
+/**
+ * Delete / deactivate a cafe table.
+ * @param {string} id - Table ObjectId
+ * @returns {Promise<Object>}
+ */
+export const deleteAdminTable = async (id) => {
+  const response = await apiClient.delete(`/admin/tables/${id}`);
+  return response.data;
+};
+
+/**
+ * Fetch all employees and users with optional filtering.
+ * @param {Object} [params] - { role, search, page, limit }
+ * @returns {Promise<Object>}
+ */
+export const getAdminUsers = async (params = {}) => {
+  const response = await apiClient.get('/admin/users', { params });
+  return response.data;
+};
+
+/**
+ * Create a new employee / staff member.
+ * @param {Object} userData - { name, email, password, role, avatar }
+ * @returns {Promise<Object>}
+ */
+export const createAdminUser = async (userData) => {
+  const response = await apiClient.post('/admin/users', userData);
+  return response.data;
+};
+
+/**
+ * Remove an employee / user account.
+ * @param {string} id - User ObjectId
+ * @returns {Promise<Object>}
+ */
+export const deleteAdminUser = async (id) => {
+  const response = await apiClient.delete(`/admin/users/${id}`);
+  return response.data;
+};
+
