@@ -12,11 +12,15 @@ import {
 
 /**
  * GET /api/v1/tables
- * Lists active cafe tables
+ * Lists active cafe tables (public endpoint — active only)
+ * GET /api/v1/admin/tables (via adminRoutes)
+ * Lists ALL cafe tables including inactive (admin endpoint)
  */
 export const getTables = async (req, res, next) => {
   try {
-    const tables = await CafeTable.find({ isActive: true }).sort({ capacity: 1, tableNumber: 1 });
+    // Admin-authenticated requests (req.user set by protect middleware) see all tables
+    const filter = req.user ? {} : { isActive: true };
+    const tables = await CafeTable.find(filter).sort({ tableNumber: 1 });
     return sendSuccess(res, 200, { tables, total: tables.length });
   } catch (error) {
     next(error);
@@ -86,6 +90,105 @@ export const checkAvailability = async (req, res, next) => {
       requestedSlot: { date, startTime, endTime, guestCount: partySize },
       availableTables: freeTables,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * POST /api/v1/admin/tables
+ * Create a new cafe table (Admin only)
+ */
+export const createTable = async (req, res, next) => {
+  try {
+    const { tableNumber, capacity, isActive } = req.body;
+    if (!tableNumber || !String(tableNumber).trim()) {
+      return sendError(res, 400, 'VALIDATION_ERROR', 'Table number is required.', [{ field: 'tableNumber' }]);
+    }
+    const cap = Number(capacity);
+    if (isNaN(cap) || cap < 1 || cap > 20) {
+      return sendError(res, 400, 'VALIDATION_ERROR', 'Capacity must be a number between 1 and 20.', [{ field: 'capacity' }]);
+    }
+    const existing = await CafeTable.findOne({ tableNumber: String(tableNumber).trim() });
+    if (existing) {
+      return sendError(res, 409, 'CONFLICT', `Table ${tableNumber} already exists.`, [{ field: 'tableNumber' }]);
+    }
+    const table = await CafeTable.create({
+      tableNumber: String(tableNumber).trim(),
+      capacity: cap,
+      isActive: isActive !== undefined ? Boolean(isActive) : true,
+    });
+    return sendSuccess(res, 201, { message: 'Table created successfully.', table });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * PATCH /api/v1/admin/tables/:id
+ * Update table capacity, number, or active status (Admin only)
+ */
+export const updateTable = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { tableNumber, capacity, isActive } = req.body;
+    const table = await CafeTable.findById(id);
+    if (!table) {
+      return sendError(res, 404, 'NOT_FOUND', 'Table not found.');
+    }
+    if (tableNumber !== undefined) {
+      const trimmed = String(tableNumber).trim();
+      if (!trimmed) {
+        return sendError(res, 400, 'VALIDATION_ERROR', 'Table number cannot be empty.', [{ field: 'tableNumber' }]);
+      }
+      const existing = await CafeTable.findOne({ tableNumber: trimmed, _id: { $ne: id } });
+      if (existing) {
+        return sendError(res, 409, 'CONFLICT', `Table ${trimmed} already exists.`, [{ field: 'tableNumber' }]);
+      }
+      table.tableNumber = trimmed;
+    }
+    if (capacity !== undefined) {
+      const cap = Number(capacity);
+      if (isNaN(cap) || cap < 1 || cap > 20) {
+        return sendError(res, 400, 'VALIDATION_ERROR', 'Capacity must be between 1 and 20.', [{ field: 'capacity' }]);
+      }
+      table.capacity = cap;
+    }
+    if (isActive !== undefined) {
+      table.isActive = Boolean(isActive);
+    }
+    await table.save();
+    return sendSuccess(res, 200, { message: 'Table updated successfully.', table });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * DELETE /api/v1/admin/tables/:id
+ * Delete or deactivate table (Admin only)
+ */
+export const deleteTable = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const table = await CafeTable.findById(id);
+    if (!table) {
+      return sendError(res, 404, 'NOT_FOUND', 'Table not found.');
+    }
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const activeBookings = await Reservation.countDocuments({
+      tableId: id,
+      status: 'confirmed',
+      reservationDate: { $gte: today },
+    });
+    if (activeBookings > 0) {
+      table.isActive = false;
+      await table.save();
+      return sendSuccess(res, 200, { message: 'Table has active bookings; marked inactive.', table });
+    }
+    await CafeTable.findByIdAndDelete(id);
+    return sendSuccess(res, 200, { message: 'Table deleted successfully.' });
   } catch (error) {
     next(error);
   }

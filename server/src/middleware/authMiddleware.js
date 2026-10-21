@@ -79,6 +79,29 @@ export const protect = async (req, res, next) => {
 };
 
 /**
+ * Optional authentication middleware — attaches req.user if a valid JWT is present,
+ * but does NOT reject the request if no token is provided. Used on public routes
+ * that behave differently for authenticated admins (e.g. includeUnavailable menu items).
+ */
+export const optionalProtect = async (req, res, next) => {
+  let token;
+  if (req.cookies && req.cookies.jwt) {
+    token = req.cookies.jwt;
+  } else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+  if (!token) return next();
+  try {
+    const decoded = jwt.verify(token, config.jwtSecret);
+    const user = await User.findById(decoded.id).select('-passwordHash');
+    if (user) req.user = user;
+  } catch {
+    // Invalid/expired token — treat as unauthenticated guest
+  }
+  next();
+};
+
+/**
  * Role-Based Access Control (RBAC) guard.
  * @param {...string} allowedRoles - Permitted roles (e.g. 'admin')
  */
