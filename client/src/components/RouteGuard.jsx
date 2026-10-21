@@ -22,7 +22,8 @@ function VerifyingSessionScreen({ message = 'Verifying security credentials...' 
   return (
     <div className="vrd-guard-root">
       <div className="vrd-guard-card vrd-guard-loading-card">
-        <RefreshCw size={36} className="vrd-spin vrd-guard-icon-spin" />
+        <img src="/images/logo.png" alt="Verdora Logo" className="vrd-guard-brand-logo" />
+        <RefreshCw size={32} className="vrd-spin vrd-guard-icon-spin" />
         <h3 className="vrd-guard-title" style={{ marginTop: '16px' }}>Verdora Sanctuary</h3>
         <p className="vrd-guard-desc">{message}</p>
       </div>
@@ -69,8 +70,9 @@ export function AdminGuard({
     return (
       <div className="vrd-guard-root">
         <div className="vrd-guard-card vrd-guard-forbidden-card">
+          <img src="/images/logo.png" alt="Verdora Logo" className="vrd-guard-brand-logo" />
           <div className="vrd-guard-icon-wrap forbidden">
-            <ShieldAlert size={38} />
+            <ShieldAlert size={34} />
           </div>
 
           <span className="vrd-guard-badge forbidden">403 Forbidden</span>
@@ -152,8 +154,9 @@ export function AdminGuard({
   return (
     <div className="vrd-guard-root">
       <div className="vrd-guard-card">
+        <img src="/images/logo.png" alt="Verdora Logo" className="vrd-guard-brand-logo" />
         <div className="vrd-guard-icon-wrap admin">
-          <ShieldCheck size={38} />
+          <ShieldCheck size={34} />
         </div>
 
         <span className="vrd-guard-badge admin">Secure Operations Portal</span>
@@ -292,8 +295,9 @@ export function MemberGuard({
   return (
     <div className="vrd-guard-root">
       <div className="vrd-guard-card">
+        <img src="/images/logo.png" alt="Verdora Logo" className="vrd-guard-brand-logo" />
         <div className="vrd-guard-icon-wrap member">
-          <Sparkles size={38} />
+          <Sparkles size={34} />
         </div>
 
         <span className="vrd-guard-badge member">Member Sanctuary</span>
