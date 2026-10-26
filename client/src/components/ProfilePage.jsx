@@ -22,6 +22,8 @@ import {
   X,
   Check,
   Plus,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { updateProfile, logout as apiLogout } from '../services/authService';
 import './ProfilePage.css';
@@ -148,6 +150,7 @@ export default function ProfilePage({
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPasswords, setShowPasswords] = useState({ current: false, new: false, confirm: false });
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [passwordMessage, setPasswordMessage] = useState(null);
 
@@ -220,6 +223,7 @@ export default function ProfilePage({
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
+      setShowPasswords({ current: false, new: false, confirm: false });
     } catch (err) {
       const msg = err?.response?.data?.error?.message || err.message || 'Failed to update password.';
       setPasswordMessage({ type: 'error', text: msg });
@@ -765,41 +769,80 @@ export default function ProfilePage({
 
             <form onSubmit={handleChangePassword}>
               <div className="vrd-pform-group">
-                <label>Current Password</label>
-                <input
-                  type="password"
-                  className="vrd-pinput"
-                  placeholder="••••••••"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  required
-                />
+                <label htmlFor="profile-current-password">Current Password</label>
+                <div className="vrd-password-wrapper">
+                  <input
+                    id="profile-current-password"
+                    type={showPasswords.current ? 'text' : 'password'}
+                    className="vrd-pinput"
+                    placeholder="••••••••"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="vrd-password-toggle-btn"
+                    onClick={() => setShowPasswords((prev) => ({ ...prev, current: !prev.current }))}
+                    aria-label={showPasswords.current ? 'Hide password' : 'Show password'}
+                    title={showPasswords.current ? 'Hide password' : 'Show password'}
+                    tabIndex={-1}
+                  >
+                    {showPasswords.current ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
 
               <div className="vrd-pform-group">
-                <label>New Password (min 8 characters)</label>
-                <input
-                  type="password"
-                  className="vrd-pinput"
-                  placeholder="••••••••"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  minLength={8}
-                  required
-                />
+                <label htmlFor="profile-new-password">New Password (min 8 characters)</label>
+                <div className="vrd-password-wrapper">
+                  <input
+                    id="profile-new-password"
+                    type={showPasswords.new ? 'text' : 'password'}
+                    className="vrd-pinput"
+                    placeholder="••••••••"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    minLength={8}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="vrd-password-toggle-btn"
+                    onClick={() => setShowPasswords((prev) => ({ ...prev, new: !prev.new }))}
+                    aria-label={showPasswords.new ? 'Hide password' : 'Show password'}
+                    title={showPasswords.new ? 'Hide password' : 'Show password'}
+                    tabIndex={-1}
+                  >
+                    {showPasswords.new ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
 
               <div className="vrd-pform-group">
-                <label>Confirm New Password</label>
-                <input
-                  type="password"
-                  className="vrd-pinput"
-                  placeholder="••••••••"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  minLength={8}
-                  required
-                />
+                <label htmlFor="profile-confirm-password">Confirm New Password</label>
+                <div className="vrd-password-wrapper">
+                  <input
+                    id="profile-confirm-password"
+                    type={showPasswords.confirm ? 'text' : 'password'}
+                    className="vrd-pinput"
+                    placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    minLength={8}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="vrd-password-toggle-btn"
+                    onClick={() => setShowPasswords((prev) => ({ ...prev, confirm: !prev.confirm }))}
+                    aria-label={showPasswords.confirm ? 'Hide password' : 'Show password'}
+                    title={showPasswords.confirm ? 'Hide password' : 'Show password'}
+                    tabIndex={-1}
+                  >
+                    {showPasswords.confirm ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
 
               <div style={{ marginTop: '22px' }}>

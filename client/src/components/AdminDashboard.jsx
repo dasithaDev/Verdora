@@ -17,6 +17,8 @@ import {
   Search,
   User,
   Users,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import {
   getDashboardStats,
@@ -72,6 +74,7 @@ export default function AdminDashboard({ onBackToCafe, onSwitchToProfile, curren
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [userForm, setUserForm] = useState({ name: '', email: '', password: '', role: 'staff', avatar: '' });
+  const [showUserPassword, setShowUserPassword] = useState(false);
   const [deleteUserConfirmTarget, setDeleteUserConfirmTarget] = useState(null);
 
   const [isDishModalOpen, setIsDishModalOpen] = useState(false);
@@ -307,6 +310,7 @@ export default function AdminDashboard({ onBackToCafe, onSwitchToProfile, curren
       await createAdminUser(userForm);
       showToast(`Team member "${userForm.name}" created successfully`);
       setIsUserModalOpen(false);
+      setShowUserPassword(false);
       setUserForm({ name: '', email: '', password: '', role: 'staff', avatar: '' });
       loadUsers(userRoleFilter);
       loadStats();
@@ -1102,9 +1106,21 @@ export default function AdminDashboard({ onBackToCafe, onSwitchToProfile, curren
 
       {/* ── MODAL: Add Staff Member ─────────────────────────────────────── */}
       {isUserModalOpen && (
-        <div className="vrd-modal-overlay" onClick={() => setIsUserModalOpen(false)}>
+        <div
+          className="vrd-modal-overlay"
+          onClick={() => {
+            setIsUserModalOpen(false);
+            setShowUserPassword(false);
+          }}
+        >
           <div className="vrd-modal-box" style={{ maxWidth: '460px' }} onClick={(e) => e.stopPropagation()}>
-            <button className="vrd-modal-close" onClick={() => setIsUserModalOpen(false)}>
+            <button
+              className="vrd-modal-close"
+              onClick={() => {
+                setIsUserModalOpen(false);
+                setShowUserPassword(false);
+              }}
+            >
               <X size={16} />
             </button>
 
@@ -1140,14 +1156,26 @@ export default function AdminDashboard({ onBackToCafe, onSwitchToProfile, curren
 
               <div className="vrd-field">
                 <label className="vrd-label">Temporary Password</label>
-                <input
-                  type="password"
-                  className="vrd-input"
-                  placeholder="Min 6 characters"
-                  value={userForm.password}
-                  onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
-                  required
-                />
+                <div className="vrd-password-wrapper">
+                  <input
+                    type={showUserPassword ? 'text' : 'password'}
+                    className="vrd-input"
+                    placeholder="Min 6 characters"
+                    value={userForm.password}
+                    onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="vrd-password-toggle-btn"
+                    onClick={() => setShowUserPassword(!showUserPassword)}
+                    aria-label={showUserPassword ? 'Hide password' : 'Show password'}
+                    title={showUserPassword ? 'Hide password' : 'Show password'}
+                    tabIndex={-1}
+                  >
+                    {showUserPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
 
               <div className="vrd-field">
@@ -1174,7 +1202,14 @@ export default function AdminDashboard({ onBackToCafe, onSwitchToProfile, curren
               </div>
 
               <div className="vrd-form-actions">
-                <button type="button" className="vrd-btn ghost" onClick={() => setIsUserModalOpen(false)}>
+                <button
+                  type="button"
+                  className="vrd-btn ghost"
+                  onClick={() => {
+                    setIsUserModalOpen(false);
+                    setShowUserPassword(false);
+                  }}
+                >
                   Cancel
                 </button>
                 <button type="submit" className="vrd-btn primary lg">

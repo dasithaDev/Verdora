@@ -31,6 +31,8 @@ import {
   Truck,
   Check,
   RefreshCw,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { getMenuItems } from '../services/menuService';
 import { createOrder, getMyOrders, cancelOrder } from '../services/orderService';
@@ -253,6 +255,7 @@ export default function VerdoraCafe({
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login');
   const [authForm, setAuthForm] = useState({ name: '', email: '', password: '' });
+  const [showAuthPassword, setShowAuthPassword] = useState(false);
   const [currentUser, setCurrentUser] = useState(propCurrentUser || null);
 
   useEffect(() => {
@@ -558,6 +561,7 @@ export default function VerdoraCafe({
       setCurrentUser(userData);
       if (onAuthSuccess) onAuthSuccess(userData);
       setIsAuthOpen(false);
+      setShowAuthPassword(false);
       setAuthForm({ name: '', email: '', password: '' });
       setAuthErrors({});
       setAuthTouched({});
@@ -2457,13 +2461,19 @@ export default function VerdoraCafe({
         <div
           className="vrd-drawer-overlay"
           style={{ alignItems: 'center', justifyContent: 'center' }}
-          onClick={() => setIsAuthOpen(false)}
+          onClick={() => {
+            setIsAuthOpen(false);
+            setShowAuthPassword(false);
+          }}
         >
           <div className="vrd-modal-box" onClick={(e) => e.stopPropagation()}>
             <button
               className="vrd-icon-btn"
               style={{ position: 'absolute', top: '16px', right: '16px' }}
-              onClick={() => setIsAuthOpen(false)}
+              onClick={() => {
+                setIsAuthOpen(false);
+                setShowAuthPassword(false);
+              }}
             >
               <X size={20} />
             </button>
@@ -2543,20 +2553,32 @@ export default function VerdoraCafe({
 
               <div className="vrd-form-group">
                 <label htmlFor="auth-password">Password {authMode === 'register' ? '(min 8 characters) *' : '*'}</label>
-                <input
-                  id="auth-password"
-                  type="password"
-                  className={`vrd-input ${authTouched.password && authErrors.password ? 'error' : ''}`}
-                  placeholder="••••••••"
-                  value={authForm.password}
-                  onChange={(e) => {
-                    setAuthForm({ ...authForm, password: e.target.value });
-                    if (authTouched.password && authErrors.password) {
-                      setAuthErrors((prev) => ({ ...prev, password: '' }));
-                    }
-                  }}
-                  required
-                />
+                <div className="vrd-password-wrapper">
+                  <input
+                    id="auth-password"
+                    type={showAuthPassword ? 'text' : 'password'}
+                    className={`vrd-input ${authTouched.password && authErrors.password ? 'error' : ''}`}
+                    placeholder="••••••••"
+                    value={authForm.password}
+                    onChange={(e) => {
+                      setAuthForm({ ...authForm, password: e.target.value });
+                      if (authTouched.password && authErrors.password) {
+                        setAuthErrors((prev) => ({ ...prev, password: '' }));
+                      }
+                    }}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="vrd-password-toggle-btn"
+                    onClick={() => setShowAuthPassword((prev) => !prev)}
+                    aria-label={showAuthPassword ? 'Hide password' : 'Show password'}
+                    title={showAuthPassword ? 'Hide password' : 'Show password'}
+                    tabIndex={-1}
+                  >
+                    {showAuthPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
                 {authTouched.password && authErrors.password && (
                   <span className="vrd-field-error">
                     <AlertCircle size={13} /> {authErrors.password}
@@ -2579,7 +2601,10 @@ export default function VerdoraCafe({
                   Don't have an account?{' '}
                   <span
                     style={{ color: 'var(--vrd-gold)', cursor: 'pointer', fontWeight: 700 }}
-                    onClick={() => setAuthMode('register')}
+                    onClick={() => {
+                      setAuthMode('register');
+                      setShowAuthPassword(false);
+                    }}
                   >
                     Sign Up
                   </span>
@@ -2589,7 +2614,10 @@ export default function VerdoraCafe({
                   Already registered?{' '}
                   <span
                     style={{ color: 'var(--vrd-gold)', cursor: 'pointer', fontWeight: 700 }}
-                    onClick={() => setAuthMode('login')}
+                    onClick={() => {
+                      setAuthMode('login');
+                      setShowAuthPassword(false);
+                    }}
                   >
                     Sign In
                   </span>
