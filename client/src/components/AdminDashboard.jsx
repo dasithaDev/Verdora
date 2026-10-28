@@ -19,6 +19,7 @@ import {
   Users,
   Eye,
   EyeOff,
+  RotateCcw,
 } from 'lucide-react';
 import {
   getDashboardStats,
@@ -81,6 +82,7 @@ export default function AdminDashboard({ onBackToCafe, onSwitchToProfile, curren
   const [editingDish, setEditingDish] = useState(null);
   const [dishForm, setDishForm] = useState({ name: '', category: 'Bowls', price: '', description: '', imageUrl: '', isAvailable: true });
   const [deleteConfirmTarget, setDeleteConfirmTarget] = useState(null);
+  const [hardDeleteConfirmTarget, setHardDeleteConfirmTarget] = useState(null);
 
   const [toastMessage, setToastMessage] = useState(null);
   const showToast = (msg) => {
@@ -234,12 +236,36 @@ export default function AdminDashboard({ onBackToCafe, onSwitchToProfile, curren
   const confirmDeleteDish = async () => {
     if (!deleteConfirmTarget) return;
     try {
-      await deleteMenuItem(deleteConfirmTarget._id);
+      await deleteMenuItem(deleteConfirmTarget._id, false);
       showToast(`Deactivated "${deleteConfirmTarget.name}" from public menu`);
       setDeleteConfirmTarget(null);
       loadMenu();
       loadStats();
     } catch { showToast('Could not deactivate item'); }
+  };
+
+  const handleReactivateDish = async (dish) => {
+    try {
+      await updateMenuItem(dish._id, { isAvailable: true });
+      showToast(`Reactivated "${dish.name}" to public menu`);
+      loadMenu();
+      loadStats();
+    } catch {
+      showToast('Could not reactivate item');
+    }
+  };
+
+  const confirmHardDeleteDish = async () => {
+    if (!hardDeleteConfirmTarget) return;
+    try {
+      await deleteMenuItem(hardDeleteConfirmTarget._id, true);
+      showToast(`Permanently deleted "${hardDeleteConfirmTarget.name}" from database`);
+      setHardDeleteConfirmTarget(null);
+      loadMenu();
+      loadStats();
+    } catch (err) {
+      showToast(err?.response?.data?.error?.message || err.message || 'Could not permanently delete item');
+    }
   };
 
   // ── Table Management Handlers ──
@@ -706,10 +732,27 @@ export default function AdminDashboard({ onBackToCafe, onSwitchToProfile, curren
                             <button className="vrd-btn primary" onClick={() => openDishModal(dish)}>
                               <Edit size={13} /> Edit
                             </button>
-                            {dish.isAvailable && (
+                            {dish.isAvailable ? (
                               <button className="vrd-btn danger" onClick={() => setDeleteConfirmTarget(dish)}>
                                 <Trash2 size={13} /> Deactivate
                               </button>
+                            ) : (
+                              <>
+                                <button
+                                  className="vrd-btn success"
+                                  title="Reactivate dish in public menu"
+                                  onClick={() => handleReactivateDish(dish)}
+                                >
+                                  <RotateCcw size={13} /> Reactivate
+                                </button>
+                                <button
+                                  className="vrd-btn danger"
+                                  title="Permanently remove dish document from MongoDB"
+                                  onClick={() => setHardDeleteConfirmTarget(dish)}
+                                >
+                                  <Trash2 size={13} /> Delete from DB
+                                </button>
+                              </>
                             )}
                           </div>
                         </td>
@@ -1291,6 +1334,40 @@ export default function AdminDashboard({ onBackToCafe, onSwitchToProfile, curren
               </button>
               <button className="vrd-btn danger" onClick={confirmDeleteDish}>
                 Yes, Deactivate
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL: Hard Delete Confirm (Purge from MongoDB) ───────────────── */}
+      {hardDeleteConfirmTarget && (
+        <div className="vrd-modal-overlay" onClick={() => setHardDeleteConfirmTarget(null)}>
+          <div className="vrd-modal-box" style={{ maxWidth: '440px' }} onClick={(e) => e.stopPropagation()}>
+            <div className="vrd-confirm-icon-row">
+              <div className="vrd-confirm-icon" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444' }}>
+                <Trash2 size={20} />
+              </div>
+              <h3 className="vrd-confirm-title" style={{ color: '#ef4444' }}>Delete from Database?</h3>
+            </div>
+            <p className="vrd-confirm-body">
+              Are you sure you want to permanently delete{' '}
+              <strong>"{hardDeleteConfirmTarget.name}"</strong>?
+              <br /><br />
+              <span style={{ color: '#f87171', fontSize: '0.84rem' }}>
+                ⚠️ <strong>Permanent Action:</strong> This will completely remove the record from MongoDB via <code>findByIdAndDelete()</code>.
+              </span>
+            </p>
+            <div className="vrd-form-actions">
+              <button className="vrd-btn ghost" onClick={() => setHardDeleteConfirmTarget(null)}>
+                Keep Inactive
+              </button>
+              <button
+                className="vrd-btn danger"
+                style={{ background: '#dc2626', borderColor: '#ef4444' }}
+                onClick={confirmHardDeleteDish}
+              >
+                <Trash2 size={13} /> Yes, Delete Permanently
               </button>
             </div>
           </div>

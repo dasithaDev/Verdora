@@ -212,7 +212,7 @@ Base URL: `http://localhost:5000/api/v1`
 | | `GET` | `/menu/:id` | Public | Retrieve single dish details by ID |
 | | `POST` | `/menu` | **Admin** | Create new menu item |
 | | `PATCH` | `/menu/:id` | **Admin** | Update dish price, description, or availability |
-| | `DELETE`| `/menu/:id` | **Admin** | Soft-deactivate menu item (`isAvailable: false`) |
+| | `DELETE`| `/menu/:id` | **Admin** | Soft-deactivate menu item (`isAvailable: false`) or hard purge with `?hard=true` |
 | **Orders** | `POST` | `/orders` | Customer | Create order with authoritative server price calculation |
 | | `GET` | `/orders/my` | Customer | Retrieve caller's order history |
 | | `GET` | `/orders/:id` | Customer / Admin | Get order details by ID (IDOR protected) |

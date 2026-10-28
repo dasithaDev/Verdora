@@ -228,10 +228,10 @@ export const updateMenuItem = async (req, res, next) => {
 };
 
 /**
- * Soft delete (deactivate) a menu item.
- * Route: DELETE /api/v1/menu/:id
+ * Soft delete (deactivate) or permanently delete a menu item.
+ * Route: DELETE /api/v1/menu/:id (soft delete: isAvailable = false)
+ * Route: DELETE /api/v1/menu/:id?hard=true (permanent removal from MongoDB)
  * Access: Admin only
- * Note: Keeps the record in MongoDB to preserve historical order integrity.
  */
 export const deleteMenuItem = async (req, res, next) => {
   try {
@@ -239,6 +239,15 @@ export const deleteMenuItem = async (req, res, next) => {
 
     if (!item) {
       return sendError(res, 404, 'NOT_FOUND', 'Menu item not found.');
+    }
+
+    // Check if hard delete requested via query param ?hard=true or ?permanent=true
+    if (req.query.hard === 'true' || req.query.permanent === 'true') {
+      await MenuItem.findByIdAndDelete(req.params.id);
+      return sendSuccess(res, 200, {
+        message: 'Menu item permanently deleted from database.',
+        deletedId: req.params.id,
+      });
     }
 
     item.isAvailable = false;

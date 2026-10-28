@@ -73,12 +73,14 @@ export const updateMenuItem = async (id, itemData) => {
 };
 
 /**
- * Soft-delete / deactivate a menu item from public customer catalog.
+ * Soft-delete / deactivate a menu item from public customer catalog, or permanently delete.
  * @param {string} id - MenuItem ObjectId
+ * @param {boolean} [permanent=false] - Whether to permanently remove from database
  * @returns {Promise<Object>}
  */
-export const deleteMenuItem = async (id) => {
-  const response = await apiClient.delete(`/menu/${id}`);
+export const deleteMenuItem = async (id, permanent = false) => {
+  const url = permanent ? `/menu/${id}?hard=true` : `/menu/${id}`;
+  const response = await apiClient.delete(url);
   return response.data;
 };
 

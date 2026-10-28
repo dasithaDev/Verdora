@@ -253,6 +253,21 @@ const runMenuTests = async () => {
       (it) => it._id === createdItemId.toString()
     );
     assert(!foundDeactivated, 'MENU-15', 'Deactivated item is excluded from public customer catalog');
+
+    // MENU-16: Admin DELETE with ?hard=true permanently purges item from MongoDB
+    const resMenu16 = await fetch(`${baseUrl}/menu/${createdItemId}?hard=true`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${adminToken}`,
+      },
+    });
+    const dataMenu16 = await resMenu16.json();
+    assert(resMenu16.status === 200, 'MENU-16', 'Admin hard DELETE returns HTTP 200');
+    assert(dataMenu16.data?.deletedId === createdItemId.toString(), 'MENU-16', 'Response contains deletedId');
+
+    // Verify item is completely deleted from MongoDB
+    const resLookupDeleted = await fetch(`${baseUrl}/menu/${createdItemId}`);
+    assert(resLookupDeleted.status === 404, 'MENU-16', 'Permanently deleted item returns HTTP 404');
   } catch (error) {
     console.error('Test execution error:', error);
     failed++;
