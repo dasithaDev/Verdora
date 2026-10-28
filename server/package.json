@@ -8,6 +8,7 @@
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
     "seed": "node src/seeds/seed.js",
+    "check:dish": "node scripts/check-dish.js",
     "test:models": "node tests/modelTests.js",
     "test:middleware": "node tests/middlewareTests.js",
     "test:auth": "node tests/authTests.js",
